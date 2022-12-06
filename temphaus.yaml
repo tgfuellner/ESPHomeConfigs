@@ -42,6 +42,11 @@ sensor:
     pin: VCC
     name: "VCC Voltage"
     update_interval: 5s
+    filters:
+      - calibrate_linear:
+        - 3.664 -> 3.496
+        - 3.46 -> 3.297
+        - 3.044 -> 2.897
 
   - platform: dallas
     address: 0x7c1a6b6d0e64ff28
