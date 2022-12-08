@@ -1,9 +1,14 @@
 # Temperatur Messung mit EspLowPower Platine
 # Nur R2,R4,R5,R6,R7 (10k) und R19 (330) und 10uF an 3.3V und Masse
 # Dallas Chip anfänglich verpolt: Strom 1A er wurde heiss - funktioniert aber trotzdem noch
+#
+# Deep Sleep beenden: in Homassist Key e, dann Entty Suche prevent, dann einschalten
  
 esphome:
   name: temphaus
+  on_boot:
+    then:
+      - script.execute: consider_deep_sleep
 
 esp8266:
   board: esp12e
@@ -40,7 +45,7 @@ dallas:
 sensor:
   - platform: adc
     pin: VCC
-    name: "VCC Voltage"
+    name: "Haus VCC Voltage Temperatur Sensor"
     update_interval: 5s
     filters:
       - calibrate_linear:
@@ -50,4 +55,32 @@ sensor:
 
   - platform: dallas
     address: 0x7c1a6b6d0e64ff28
-    name: "Temperatur"
+    name: "Haus Temperatur"
+
+# Deep Sleep Ota enable:
+# https://tatham.blog/2021/02/06/esphome-batteries-deep-sleep-and-over-the-air-updates/
+
+deep_sleep:
+  sleep_duration: 10min
+  id: deep_sleep_temphaus
+
+# Will only pick up a value if this device is configured in Home Assistant > Integrations
+# If the device isn't configured, or Home Assistant is offline, it'll default to false
+binary_sensor:
+  - platform: homeassistant
+    entity_id: input_boolean.prevent_deep_sleep
+    id: prevent_deep_sleep
+
+script:
+  - id: consider_deep_sleep
+    mode: queued
+    then:
+      - delay: 20s
+      - if:
+          condition:
+            binary_sensor.is_on: prevent_deep_sleep
+          then:
+            - logger.log: 'Skipping sleep, per prevent_deep_sleep'
+          else:
+            - deep_sleep.enter: deep_sleep_temphaus
+      - script.execute: consider_deep_sleep
