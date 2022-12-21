@@ -1,6 +1,6 @@
 # ESPHomeConfigs
 
 - Usefull commands:
-    - ephome run xx.yaml
+    - esphome run xx.yaml     # Geht auch bei initialen flashen über Usb!
     - esphome logs xx.yaml
     - esphome dashboard xx.yaml
