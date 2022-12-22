@@ -44,5 +44,21 @@ switch:
       number: D8
       inverted: true
     name: "Vestel allow charging"
+    id: sw_allow_charging
     device_class: switch
     restore_mode: ALWAYS_ON
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: D6
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+    name: "Vestel allow button"
+    on_click:
+      min_length: 50ms
+      max_length: 350ms
+      then:
+        - switch.turn_on: sw_allow_charging
