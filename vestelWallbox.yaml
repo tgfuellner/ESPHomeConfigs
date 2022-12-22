@@ -32,8 +32,13 @@ captive_portal:
 
 
 
-# Nehme D8, weil er auf Masse gepulled ist und so das Ralay nicht anzieht
 switch:
+  - platform: gpio
+    pin: 
+      number: D7
+    name: "Vestel 8A charging"
+    device_class: switch
+    restore_mode: ALWAYS_OFF
   - platform: gpio
     pin: 
       number: D8
