@@ -34,6 +34,10 @@ text_sensor:
     entity_id: sensor.battery_level
     internal: true
   - platform: homeassistant
+    id: soc_haus
+    entity_id: sensor.sonnen_soc
+    internal: true
+  - platform: homeassistant
     id: inkplate_battery_voltage
     entity_id: sensor.inkplate_battery_voltage
     internal: true
@@ -174,17 +178,26 @@ display:
 
   lambda: |-
     it.fill(COLOR_ON);
+    const int x_label = 170;
+    const int x_value = 180;
+    const int y_label = 90;
+    const int y_value = 120;
+    const int line_spacing = 150;
+    int row = 0;
 
-    it.print(170, 70, id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Spring:");
-    it.printf(180, 100, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_spring).state.c_str());
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Spring:");
+    it.printf(x_value, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_spring).state.c_str());
 
-    it.print(170, 220, id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ioniq:");
-    it.printf(180, 250, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_ioniq).state.c_str());
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ioniq:");
+    it.printf(x_value, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_ioniq).state.c_str());
 
-    it.print(170, 370, id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew.:");
-    it.printf(180, 400, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_ladewagen).state.c_str());
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew:");
+    it.printf(x_value, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_ladewagen).state.c_str());
 
-    it.rectangle(480, 5, 3, 400, COLOR_OFF);
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Haus:");
+    it.printf(x_value, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s%%", id(soc_haus).state.c_str());
+
+    it.rectangle(480, 5, 3, 595, COLOR_OFF);
 
     //it.strftime(800, 560, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
