@@ -1,4 +1,6 @@
-# Example configuration entry
+# Status Display
+# Siehe https://github.com/hanspeda/esphome_homeassistant_display/blob/aa3692f4f687b46d6d0564f673cf51bfa3225d60/esphome-web-399610.yaml
+
 esphome:
   name: inkplate
 
@@ -36,9 +38,19 @@ text_sensor:
     entity_id: sensor.inkplate_battery_voltage
     internal: true
 
+    on_value: # Actions to perform once data for the last sensor has been received
+      then:
+        - script.execute: all_data_received
+
+script:
+  - id: all_data_received
+    then:
+      - component.update: inkplate_display
+      # - script.execute: enter_sleep
+
 deep_sleep:
-  run_duration: 22s
-  sleep_duration: 1min
+  run_duration: 30s
+  sleep_duration: 10min
 
 
 switch:
@@ -134,7 +146,7 @@ display:
   id: inkplate_display
   greyscale: false
   partial_updating: false
-  update_interval: 13s
+  update_interval: never
 
   ckv_pin: 32
   sph_pin: 33
