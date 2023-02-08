@@ -134,13 +134,13 @@ time:
     id: esptime
 
 font:
-  - file: "Arial.ttf"
+  - file: "fonts/Arial.ttf"
     id: helvetica_96
     size: 96
-  - file: "Arial.ttf"
+  - file: "fonts/Arial.ttf"
     id: helvetica_48
     size: 48
-  - file: "Arial.ttf"
+  - file: "fonts/Arial.ttf"
     id: helvetica_24
     size: 24
 
