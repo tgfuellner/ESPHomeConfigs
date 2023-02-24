@@ -1,0 +1,189 @@
+substitutions:
+  device_name: "atorch-shelly"
+  # Higher value gives lower watt readout
+  current_res: "0.001"
+  # Lower value gives lower voltage readout
+  voltage_div: "1925"
+  external_components_source: github://syssi/esphome-atorch-dl24@main
+  dl24_mac_address: 47:71:F7:A9:11:F5
+  project_version: 1.2.0
+  device_description: "Monitor and control a Atorch meter via bluetooth"
+
+
+esphome:
+  name: ${device_name}
+  platformio_options:
+    board_build.f_cpu: 160000000L
+  comment: ${device_description}
+  project:
+    name: "syssi.esphome-atorch-dl24"
+    version: ${project_version}
+
+
+esp32:
+  board: esp32doit-devkit-v1
+  framework:
+    type: esp-idf
+    sdkconfig_options:
+      CONFIG_FREERTOS_UNICORE: y
+      CONFIG_ESP32_DEFAULT_CPU_FREQ_160: y
+      CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ: "160"
+
+
+external_components:
+  - source: ${external_components_source}
+    refresh: 0s
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "TreppenLicht Fallback Hotspot"
+    password: !secret fallbackHotspot_password
+
+ota:
+  password: !secret ota_password
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+esp32_ble_tracker:
+
+ble_client:
+  - mac_address: ${dl24_mac_address}
+    id: ble_client0
+
+output:
+  - platform: gpio
+    id: "relay_output"
+    pin: GPIO26
+
+atorch_dl24:
+  - id: atorch0
+    ble_client_id: ble_client0
+    check_crc: true
+    # The meter publishes a status report per second via BLE notification. If you don't like this update interval
+    # you can use this setting to throttle the sensor updates by skipping some status reports.
+    throttle: 10s
+
+
+switch:
+  - platform: output
+    id: "relay"
+    name: "${device_name} Relay"
+    output: "relay_output"
+
+binary_sensor:
+  - platform: atorch_dl24
+    atorch_dl24_id: atorch0
+    running:
+      name: "${device_name} running"
+  - platform: gpio
+    name: "${device_name} Switch"
+    pin: GPIO4
+    on_press:
+      then:
+        - switch.toggle: "relay"
+    filters:
+      - delayed_on_off: 50ms
+  - platform: gpio
+    name: "${device_name} Button"
+    pin:
+      number: GPIO25
+      inverted: yes
+      mode:
+        input: true
+        pullup: true
+    on_press:
+      then:
+        - switch.toggle: "relay"
+    filters:
+      - delayed_on_off: 5ms
+
+sensor:
+  - platform: ntc
+    sensor: temp_resistance_reading
+    name: "${device_name} Temperature"
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
+    icon: "mdi:thermometer"
+    calibration:
+      b_constant: 3350
+      reference_resistance: 10kOhm
+      reference_temperature: 298.15K
+    on_value_range:
+      - above: "80.0"
+        then:
+          - switch.turn_off: "relay"
+  - platform: resistance
+    id: temp_resistance_reading
+    sensor: temp_analog_reading
+    configuration: DOWNSTREAM
+    resistor: 10kOhm
+  - platform: adc
+    id: temp_analog_reading
+    pin: GPIO32
+    attenuation: 11db
+  - platform: atorch_dl24
+    atorch_dl24_id: atorch0
+    voltage:
+      name: "${device_name} voltage"
+    current:
+      name: "${device_name} current"
+    power:
+      name: "${device_name} power"
+    capacity:
+      name: "${device_name} capacity"
+    energy:
+      name: "${device_name} energy"
+    temperature:
+      name: "${device_name} temperature"
+    dim_backlight:
+      name: "${device_name} dim backlight"
+    running:
+      name: "${device_name} running"
+    runtime:
+      name: "${device_name} runtime"
+
+  - platform: adc
+    name: "${device_name} Relay Supply Voltage"
+    pin: GPIO33
+    attenuation: 11db
+    filters:
+      - multiply: 8
+
+text_sensor:
+  - platform: atorch_dl24
+    atorch_dl24_id: atorch0
+    runtime_formatted:
+      name: "${device_name} runtime formatted"
+
+status_led:
+  pin:
+    number: GPIO0
+    inverted: true
+
+button:
+  - platform: atorch_dl24
+    atorch_dl24_id: atorch0
+    reset_energy:
+      name: "${device_name} reset energy"
+    reset_capacity:
+      name: "${device_name} reset capacity"
+    reset_runtime:
+      name: "${device_name} reset runtime"
+    reset_all:
+      name: "${device_name} reset all"
+    plus:
+      name: "${device_name} plus"
+    minus:
+      name: "${device_name} minus"
+    setup:
+      name: "${device_name} setup"
+    enter:
+      name: "${device_name} enter"
