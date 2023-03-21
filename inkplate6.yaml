@@ -24,6 +24,18 @@ api:
 
 text_sensor:
   - platform: homeassistant
+    id: temperatur_boiler
+    entity_id: sensor.boiler
+    internal: true
+  - platform: homeassistant
+    id: temperatur_wohnen
+    entity_id: sensor.temperatur
+    internal: true
+  - platform: homeassistant
+    id: temperatur_garage
+    entity_id: sensor.garagetemp1
+    internal: true
+  - platform: homeassistant
     id: soc_ladewagen
     entity_id: sensor.ladewagensoc
     internal: true
@@ -32,8 +44,8 @@ text_sensor:
     entity_id: sensor.evnotify_charge_status
     internal: true
   - platform: homeassistant
-    id: soc_spring
-    entity_id: sensor.battery_level
+    id: soc_tesla
+    entity_id: sensor.teslasoc
     internal: true
   - platform: homeassistant
     id: soc_haus
@@ -54,12 +66,12 @@ text_sensor:
     internal: true
 
   - platform: homeassistant
-    id: spring_falling
-    entity_id: binary_sensor.trend_soc_spring_falling
+    id: tesla_falling
+    entity_id: binary_sensor.trend_soc_tesla_falling
     internal: true
   - platform: homeassistant
-    id: spring_increasing
-    entity_id: binary_sensor.trend_soc_spring_increasing
+    id: tesla_increasing
+    entity_id: binary_sensor.trend_soc_tesla_increasing
     internal: true
 
   - platform: homeassistant
@@ -131,6 +143,7 @@ sensor:
     pin: 35
   - platform: template
     name: "Inkplate Battery Voltage"
+    device_class: VOLTAGE
     lambda: |-
       id(battery_read_mosfet).turn_on();
       delay(1);
@@ -226,13 +239,12 @@ display:
     const int x_value = 175;
     const int y_label = 90;
     const int y_value = 120;
-    const int line_spacing = 150;
+    int line_spacing = 150;
     int row = 0;
 
-    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Spring:");
-    //it.print(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, ICON_Down);
-    it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(spring_increasing).state, id(spring_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_spring).state.c_str());
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Tesla:");
+    it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(tesla_increasing).state, id(tesla_falling).state));
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_tesla).state.c_str());
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ioniq:");
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ioniq_increasing).state, id(ioniq_falling).state));
@@ -246,7 +258,19 @@ display:
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(haus_increasing).state, id(haus_falling).state));
     it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_haus).state.c_str());
 
-    it.rectangle(480, 5, 3, 595, COLOR_OFF);
+    it.rectangle(410, 5, 3, 590, COLOR_OFF);
+
+    row = 0;
+    const int x2_label = 520;
+    const int x2_value = x2_label+5;
+    line_spacing = 75;
+
+    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Garage:");
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_garage).state.c_str());
+    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Wohnen:");
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_wohnen).state.c_str());
+    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Boiler:");
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_boiler).state.c_str());
 
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
