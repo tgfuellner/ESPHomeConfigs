@@ -48,6 +48,10 @@ text_sensor:
     entity_id: sensor.teslasoc
     internal: true
   - platform: homeassistant
+    id: soc_niu
+    entity_id: sensor.niusoc
+    internal: true
+  - platform: homeassistant
     id: soc_haus
     entity_id: sensor.sonnen_soc
     internal: true
@@ -239,6 +243,8 @@ display:
     const int x_value = 175;
     const int y_label = 90;
     const int y_value = 120;
+    const int x2_label = 520;
+    const int x2_value = x2_label+5;
     int line_spacing = 150;
     int row = 0;
 
@@ -252,7 +258,10 @@ display:
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew:");
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ladew_increasing).state, id(ladew_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ladewagen).state.c_str());
+    it.printf(x_value+60, y_value+(line_spacing*row), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ladewagen).state.c_str());
+    // Next is same Row!
+    it.print(x2_label+35, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Roller:");
+    it.printf(x2_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_niu).state.c_str());
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Haus:");
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(haus_increasing).state, id(haus_falling).state));
@@ -261,8 +270,6 @@ display:
     it.rectangle(410, 5, 3, 590, COLOR_OFF);
 
     row = 0;
-    const int x2_label = 520;
-    const int x2_value = x2_label+5;
     line_spacing = 75;
 
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Garage:");
