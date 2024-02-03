@@ -17,3 +17,8 @@
         - 2 = IO-0, muss beim Flashen mit Masse verbunden sein
         - 5 = RX wird mit TX vom Programmierer verbunden
         - 6 = TX wird mit RX ...
+
+- Docker
+    - docker pull ghcr.io/esphome/esphome
+    - docker run --rm -v "${PWD}":/config -it ghcr.io/esphome/esphome logs tv_sonoff_pow_r1.yaml
+    - docker run --rm --privileged -v "${PWD}":/config --device=/dev/ttyUSB0 -it ghcr.io/esphome/esphome run ...yaml
