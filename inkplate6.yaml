@@ -29,7 +29,7 @@ text_sensor:
     internal: true
   - platform: homeassistant
     id: temperatur_wohnen
-    entity_id: sensor.temperatur
+    entity_id: sensor.haus_temperatur_2
     internal: true
   - platform: homeassistant
     id: temperatur_garage

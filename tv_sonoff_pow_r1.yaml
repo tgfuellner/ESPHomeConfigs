@@ -15,7 +15,7 @@ captive_portal:
 
 api:
   encryption:
-    key: "HOXXs1eugzrjrsM1FQkvVvbvBjNNI5ZarXD1JpeEE2M="
+    key: !secret api_encryption_key
 
 ota:
   password: "e2b2c51869024ef64b70cb81d438e730"

@@ -19,7 +19,7 @@ logger:
 # Enable Home Assistant API
 api:
   encryption:
-    key: "HOXXs1eugzrjrsM1FQkvVvbvBjNNI5ZarXD1JpeEE2M="
+    key: !secret api_encryption_key
 
 ota:
   password: "e2b2c51869024ef64b70cb81d438e730"
@@ -54,7 +54,8 @@ sensor:
         - 3.044 -> 2.897
 
   - platform: dallas
-    address: 0x7c1a6b6d0e64ff28
+    #address: 0x7c1a6b6d0e64ff28
+    index: 0
     name: "Haus Temperatur"
 
 # Deep Sleep Ota enable:
@@ -75,7 +76,7 @@ script:
   - id: consider_deep_sleep
     mode: queued
     then:
-      - delay: 20s
+      - delay: 26s
       - if:
           condition:
             binary_sensor.is_on: prevent_deep_sleep
