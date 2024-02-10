@@ -28,8 +28,12 @@ text_sensor:
     entity_id: sensor.boiler
     internal: true
   - platform: homeassistant
-    id: temperatur_wohnen
-    entity_id: sensor.haus_temperatur_2
+    id: strom_preis
+    entity_id: sensor.electricity_price_pyramoos_12
+    internal: true
+  - platform: homeassistant
+    id: temperatur_nord
+    entity_id: sensor.0xa4c138aa22a4fa38_temperature
     internal: true
   - platform: homeassistant
     id: temperatur_garage
@@ -245,7 +249,7 @@ display:
     const int y_value = 120;
     const int x2_label = 520;
     const int x2_value = x2_label+5;
-    int line_spacing = 150;
+    int line_spacing = 113;
     int row = 0;
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Tesla:");
@@ -256,12 +260,13 @@ display:
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ioniq_increasing).state, id(ioniq_falling).state));
     it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ioniq).state.c_str());
 
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Roller:");
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_niu).state.c_str());
+
+
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew:");
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ladew_increasing).state, id(ladew_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ladewagen).state.c_str());
-    // Next is same Row!
-    it.print(x2_label+35, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Roller:");
-    it.printf(x2_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_niu).state.c_str());
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ladewagen).state.c_str());
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Haus:");
     it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(haus_increasing).state, id(haus_falling).state));
@@ -274,10 +279,13 @@ display:
 
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Garage:");
     it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_garage).state.c_str());
-    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Wohnen:");
-    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_wohnen).state.c_str());
+    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Norden:");
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_nord).state.c_str());
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Boiler:");
     it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_boiler).state.c_str());
+    row++;
+    it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Strom:");
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s EUR", id(strom_preis).state.c_str());
 
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
