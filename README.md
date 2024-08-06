@@ -3,6 +3,7 @@
 - Usefull commands:
     - esphome config treppenLicht.yaml
     - esphome compile treppenLicht.yaml
+      - in .esphome/build/singleplug/.pioenvs/treppenLicht/firmware.bin findet sich das binary
     - esphome run xx.yaml     # Geht auch bei initialen flashen über Usb!
     - esphome logs xx.yaml
     - esphome dashboard xx.yaml
