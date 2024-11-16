@@ -29,9 +29,13 @@ ota:
   platform: esphome
 
 wifi:
-  ssid: Aura
-  password: !secret wifi_password
-  fast_connect: on
+  networks:
+  - ssid: Aura
+    password: !secret wifi_password
+  - ssid: WLAN
+    password: !secret wifi_password
+  - ssid: ladewagen
+    password: !secret wifi_password
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
