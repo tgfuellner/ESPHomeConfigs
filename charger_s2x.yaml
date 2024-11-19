@@ -1,0 +1,61 @@
+# SonOff S26
+# Lies sich nicht auf den Charger spielen. Tasmota Update ging auch nicht.
+# Denke ist ein Problem auf dem Charger ESP
+
+esphome:
+  name: charger_s2x
+  
+esp8266:
+  board: esp01_1m
+  board_flash_mode: dout
+
+wifi:
+  networks:
+  - ssid: ladewagen
+    password: !secret wifi_password
+  - ssid: !secret wifi_ssid
+    password: !secret wifi_password
+  ap:
+    ssid: "ap_charger_s2x"
+    password: "Password"
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: false
+logger:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  platform: esphome
+
+web_server:
+  port: 80
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+      inverted: True
+    name: "charger_s2x Button"
+    on_press:
+      - switch.toggle: relay
+  - platform: status
+    name: "charger_s2x Status"
+
+sensor:
+  - platform: wifi_signal
+    name: "charger_s2x WiFi Signal"
+    update_interval: 120s
+switch:
+  - platform: gpio
+    name: "charger_s2x Relay"
+    pin: GPIO12
+    id: "relay"
+  - platform: restart
+    name: "charger_s2x Restart"
+
