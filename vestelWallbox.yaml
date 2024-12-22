@@ -18,6 +18,7 @@ api:
 
 ota:
   password: "e2b2c51869024ef64b70cb81d438e730"
+  platform: esphome
 
 wifi:
   ssid: !secret wifi_ssid
@@ -46,7 +47,7 @@ switch:
     name: "Vestel allow charging"
     id: sw_allow_charging
     device_class: switch
-    restore_mode: ALWAYS_ON
+    restore_mode: RESTORE_DEFAULT_ON
 
 binary_sensor:
   - platform: gpio
@@ -61,4 +62,4 @@ binary_sensor:
       min_length: 50ms
       max_length: 350ms
       then:
-        - switch.turn_on: sw_allow_charging
+        - switch.toggle: sw_allow_charging

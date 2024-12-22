@@ -80,6 +80,7 @@ number:
     # Maximum output power in limiter mode / Output power in constant power mode
     output_power_limit:
       name: "Output Power Limit"
+      max_value: 1200
     start_delay:
       name: "Start Delay"
 
