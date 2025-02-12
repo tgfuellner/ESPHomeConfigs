@@ -38,6 +38,9 @@ wifi:
 captive_portal:
 
 font:
+  - id: roboto_14
+    file: gfonts://Roboto
+    size: 14
   - id: roboto_16
     file: gfonts://Roboto
     size: 16
@@ -49,12 +52,55 @@ spi:
   mosi_pin: GPIO8
   clk_pin: GPIO7
 
+time:
+  - platform: sntp
+    id: esptime
+
+text_sensor:
+  - platform: homeassistant
+    id: strom_preis
+    entity_id: sensor.pyramoos_12_strompreis
+    internal: true
+  - platform: homeassistant
+    id: soc_felicity
+    entity_id: sensor.felicity_ess_bat1_soc
+    internal: true
+  - platform: homeassistant
+    id: soc_ladewagen
+    entity_id: sensor.ladewagensoc
+    internal: true
+  - platform: homeassistant
+    id: soc_ioniq
+    entity_id: sensor.evnotify_charge_status
+    internal: true
+  - platform: homeassistant
+    id: soc_tesla
+    entity_id: sensor.teslasoc
+    internal: true
+  - platform: homeassistant
+    id: soc_niu
+    entity_id: sensor.niusoc
+    internal: true
+  - platform: homeassistant
+    id: soc_haus
+    entity_id: sensor.sonnenbatterie_99688_state_battery_percentage_user
+    internal: true
+
+    #on_value: # Actions to perform once data for the last sensor has been received
+    #  then:
+    #    - script.execute: all_data_received
+
+script:
+  - id: all_data_received
+    then:
+      - component.update: trmnl_display
+
 display:
   platform: waveshare_epaper
   id: trmnl_display
   cs_pin: GPIO6
   model: 7.50inv2
-  update_interval: 60s
+  update_interval: 30s
   dc_pin: GPIO5
   reset_pin: GPIO10
   busy_pin:
@@ -63,10 +109,17 @@ display:
   pages:
     - id: main_page
       lambda: |-
-        it.print(100, 100, id(roboto_32), "Hello ESPHome on TRMNL!");
+        it.printf(10,50, id(roboto_32), TextAlign::BOTTOM_LEFT, "Akkus: T:%s%% I:%s%% | H:%s%% F:%s%% L:%s%%",
+            id(soc_tesla).state.c_str(),
+            id(soc_ioniq).state.c_str(),
+            id(soc_haus).state.c_str(),
+            id(soc_felicity).state.c_str(),
+            id(soc_ladewagen).state.c_str()
+        );
         it.printf(100, 200, id(roboto_32), "Uptime: %d seconds", millis() / 1000);
 
-        it.printf(750, 430, id(roboto_16), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
+        it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
+        it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
 
 binary_sensor:
   - platform: gpio
