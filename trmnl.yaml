@@ -10,7 +10,8 @@ esphome:
 esp32:
   board: esp32-c3-devkitm-1
   framework:
-    type: esp-idf
+    type: arduino
+    #type: esp-idf
 
 # To be able to get logs from the device via serial and api.
 logger:
@@ -41,12 +42,12 @@ font:
   - id: roboto_14
     file: gfonts://Roboto
     size: 14
-  - id: roboto_16
-    file: gfonts://Roboto
-    size: 16
   - id: roboto_32
     file: gfonts://Roboto
     size: 32
+  - id: roboto_48
+    file: gfonts://Roboto
+    size: 48
 
 spi:
   mosi_pin: GPIO8
@@ -56,11 +57,23 @@ time:
   - platform: sntp
     id: esptime
 
-text_sensor:
+sensor:
   - platform: homeassistant
     id: strom_preis
     entity_id: sensor.pyramoos_12_strompreis
     internal: true
+    state_class: "total" 
+    unit_of_measurement: "€"
+  - platform: adc
+    name: Battery Voltage
+    id: battery_voltage
+    pin: GPIO3
+    attenuation: 12db
+    samples: 128
+    filters:
+      - multiply: 2.0
+
+text_sensor:
   - platform: homeassistant
     id: soc_felicity
     entity_id: sensor.felicity_ess_bat1_soc
@@ -77,18 +90,18 @@ text_sensor:
     id: soc_tesla
     entity_id: sensor.teslasoc
     internal: true
-  - platform: homeassistant
-    id: soc_niu
-    entity_id: sensor.niusoc
-    internal: true
+  #  - platform: homeassistant
+  #  id: soc_niu
+  #  entity_id: sensor.niusoc
+  #  internal: true
   - platform: homeassistant
     id: soc_haus
     entity_id: sensor.sonnenbatterie_99688_state_battery_percentage_user
     internal: true
 
-    #on_value: # Actions to perform once data for the last sensor has been received
-    #  then:
-    #    - script.execute: all_data_received
+    on_value: # Actions to perform once data for the last sensor has been received
+      then:
+        - script.execute: all_data_received
 
 script:
   - id: all_data_received
@@ -100,7 +113,8 @@ display:
   id: trmnl_display
   cs_pin: GPIO6
   model: 7.50inv2
-  update_interval: 30s
+  update_interval: never
+  # update_interval: 30s
   dc_pin: GPIO5
   reset_pin: GPIO10
   busy_pin:
@@ -116,10 +130,17 @@ display:
             id(soc_felicity).state.c_str(),
             id(soc_ladewagen).state.c_str()
         );
-        it.printf(100, 200, id(roboto_32), "Uptime: %d seconds", millis() / 1000);
+
+        it.filled_rectangle(10,70, 130, 80, COLOR_ON);
+        it.printf(15,140, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(strom_preis).state);
 
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
+
+deep_sleep:
+  run_duration: 30s
+  # run_duration: 180s
+  sleep_duration: 10min
 
 binary_sensor:
   - platform: gpio
@@ -129,12 +150,3 @@ binary_sensor:
       number: GPIO9
       inverted: true
 
-sensor:
-  - platform: adc
-    name: Battery Voltage
-    id: battery_voltage
-    pin: GPIO3
-    attenuation: 12db
-    samples: 128
-    filters:
-      - multiply: 2.0
