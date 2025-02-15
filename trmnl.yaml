@@ -131,14 +131,16 @@ display:
             id(soc_ladewagen).state.c_str()
         );
 
+        // Strompreis
         it.filled_rectangle(10,70, 130, 80, COLOR_ON);
         it.printf(15,140, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(strom_preis).state);
+        it.printf(15,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
 
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
 
 deep_sleep:
-  run_duration: 30s
+  run_duration: 40s
   # run_duration: 180s
   sleep_duration: 10min
 
