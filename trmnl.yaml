@@ -64,6 +64,18 @@ sensor:
     internal: true
     state_class: "total" 
     unit_of_measurement: "€"
+  - platform: homeassistant
+    id: tageskosten
+    entity_id: sensor.tibber_pulse_pyramoos_12_kumulierte_kosten
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "€"
+  - platform: homeassistant
+    id: monatskosten
+    entity_id: sensor.pyramoos_12_monatliche_kosten
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "€"
   - platform: adc
     name: Battery Voltage
     id: battery_voltage
@@ -131,10 +143,23 @@ display:
             id(soc_ladewagen).state.c_str()
         );
 
-        // Strompreis
-        it.filled_rectangle(10,70, 130, 80, COLOR_ON);
-        it.printf(15,140, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(strom_preis).state);
-        it.printf(15,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
+        int x = 10;
+        // Aktueller Strompreis
+        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
+        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
+        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
+
+        // Kumulierte Stromkosten des Tages
+        x += 135;
+        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
+        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
+        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Tageskosten");
+
+        // Kumulierte Stromkosten des Monats
+        x += 135;
+        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
+        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
+        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
 
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
