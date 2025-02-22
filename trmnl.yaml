@@ -48,6 +48,16 @@ font:
   - id: roboto_48
     file: gfonts://Roboto
     size: 48
+  - id: nerd_32
+    file: "fonts/JetBrainsMonoNerdFont-Medium.ttf"
+    glyphs: [
+      "0123456789",
+      "ATIHFLR |kus:",
+      "\uf015", # Home
+      "\ueea0", # Car
+      "\U000f0727", # Trailer
+    ]
+    size: 32
 
 spi:
   mosi_pin: GPIO8
@@ -139,7 +149,7 @@ display:
   pages:
     - id: main_page
       lambda: |-
-        it.printf(10,50, id(roboto_32), TextAlign::BOTTOM_LEFT, "Akkus: T:%s%% I:%s%% | H:%s%% F:%s%% L:%s%%",
+        it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0T:%s \ueea0I:%s | \uf015:%s F:%s \U000f0727:%s",
             id(soc_tesla).state.c_str(),
             id(soc_ioniq).state.c_str(),
             id(soc_haus).state.c_str(),
