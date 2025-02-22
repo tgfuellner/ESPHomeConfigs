@@ -87,6 +87,10 @@ sensor:
 
 text_sensor:
   - platform: homeassistant
+    id: muell
+    entity_id: sensor.muellabfuhr_erding
+    internal: true
+  - platform: homeassistant
     id: soc_felicity
     entity_id: sensor.felicity_ess_bat1_soc
     internal: true
@@ -160,6 +164,22 @@ display:
         it.filled_rectangle(x,70, 130, 80, COLOR_ON);
         it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
         it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
+
+        // Müll in x Tagen
+        x += 145;
+        auto s = id(muell).state.c_str();
+        char *semicolon = rindex(s, ';');
+        if (semicolon != NULL) {
+          *semicolon = 0;
+          it.printf(x,115, id(roboto_32), TextAlign::BOTTOM_LEFT, s);
+          if (*(semicolon+1) == '1') {
+            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen", semicolon+1);
+          } else {
+            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "in %s Tagen", semicolon+1);
+          }
+        } else {
+          it.printf(x,125, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
+        }
 
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
