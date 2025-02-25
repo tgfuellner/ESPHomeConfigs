@@ -97,6 +97,10 @@ sensor:
 
 text_sensor:
   - platform: homeassistant
+    id: rente
+    entity_id: number.renten_countdown
+    internal: true
+  - platform: homeassistant
     id: muell
     entity_id: sensor.muellabfuhr_erding
     internal: true
@@ -179,11 +183,20 @@ display:
         x += 145;
         auto s = id(muell).state.c_str();
         char *semicolon = rindex(s, ';');
+        int width;
         if (semicolon != NULL) {
           *semicolon = 0;
           it.printf(x,115, id(roboto_32), TextAlign::BOTTOM_LEFT, s);
+          int x1, y1, height;
+          it.get_text_bounds(x, 115, s, roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width, &height);
+          *semicolon = ';';
+          it.rectangle(x-5, 70, width+10, 80, COLOR_ON);
+
           if (*(semicolon+1) == '1') {
-            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen", semicolon+1);
+            it.rectangle(x-4, 71, width+8, 78, COLOR_ON);
+            it.rectangle(x-3, 72, width+6, 76, COLOR_ON);
+            it.rectangle(x-2, 73, width+4, 74, COLOR_ON);
+            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen");
           } else {
             it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "in %s Tagen", semicolon+1);
           }
@@ -191,6 +204,11 @@ display:
           it.printf(x,125, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
         }
 
+        // Renten in ... Tagen
+        x += width+15;
+        it.printf(x,130, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
+
+        // Status: Last updated, Battery Voltage
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
 
