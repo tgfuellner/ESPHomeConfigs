@@ -45,6 +45,12 @@ font:
   - id: roboto_32
     file: gfonts://Roboto
     size: 32
+    glyphs: [
+      "0123456789 ,.+-",
+      "abcdefghijklmnopqrstuvwxyz",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "ü",
+    ]
   - id: roboto_48
     file: gfonts://Roboto
     size: 48
@@ -190,7 +196,6 @@ display:
           int x1, y1, height;
           it.get_text_bounds(x, 115, s, roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width, &height);
           *semicolon = ';';
-          it.rectangle(x-5, 70, width+10, 80, COLOR_ON);
 
           if (*(semicolon+1) == '1') {
             it.rectangle(x-4, 71, width+8, 78, COLOR_ON);
@@ -198,8 +203,12 @@ display:
             it.rectangle(x-2, 73, width+4, 74, COLOR_ON);
             it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen");
           } else {
+            int width2;
+            it.get_text_bounds(x, 115, "in 0 Tagen", roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width2, &height);
+            if (width2 > width) width = width2;
             it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "in %s Tagen", semicolon+1);
           }
+          it.rectangle(x-5, 70, width+10, 80, COLOR_ON);
         } else {
           it.printf(x,125, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
         }
@@ -213,7 +222,7 @@ display:
         it.printf(790, 470, id(roboto_14), TextAlign::BOTTOM_RIGHT, "Battery: %.2fV", id(battery_voltage).state);
 
 deep_sleep:
-  run_duration: 40s
+  run_duration: 30s
   # run_duration: 180s
   sleep_duration: 10min
 
