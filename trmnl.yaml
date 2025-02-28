@@ -46,7 +46,7 @@ font:
     file: gfonts://Roboto
     size: 32
     glyphs: [
-      "0123456789 ,.+-",
+      "0123456789 ,.+-:",
       "abcdefghijklmnopqrstuvwxyz",
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       "ü",
@@ -65,6 +65,15 @@ font:
       "\uf127", # No link
     ]
     size: 32
+  - id: nerd_20
+    file: "fonts/JetBrainsMonoNerdFont-Medium.ttf"
+    glyphs: [
+      "0123456789 ,.+-:",
+      "abcdefghijklmnopqrstuvwxyz",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "äöüß",
+    ]
+    size: 20
 
 spi:
   mosi_pin: GPIO8
@@ -103,6 +112,10 @@ sensor:
       - multiply: 2.0
 
 text_sensor:
+  - platform: homeassistant
+    id: agenda
+    entity_id: input_text.agenda
+    internal: true
   - platform: homeassistant
     id: rente
     entity_id: number.renten_countdown
@@ -218,6 +231,19 @@ display:
         // Rente in ... Tagen
         x += width+15;
         it.printf(x,130, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
+
+        // Agenda
+        x = 10; int y = 195;
+        s = id(agenda).state.c_str();
+        char *del;
+        do {
+          del = index(s, '~');
+          if (del != NULL) *del = 0;
+          it.printf(x,y, id(nerd_20), TextAlign::BOTTOM_LEFT, "%s", s);
+          if (del != NULL) *del = '~';
+          y += 21;
+          s = del+1;
+        } while (del != NULL);
 
         // Status: Last updated, Battery Voltage
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
