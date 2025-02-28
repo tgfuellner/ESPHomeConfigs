@@ -62,6 +62,7 @@ font:
       "\uf015", # Home
       "\ueea0", # Car
       "\U000f0727", # Trailer
+      "\uf127", # No link
     ]
     size: 32
 
@@ -159,12 +160,13 @@ display:
   pages:
     - id: main_page
       lambda: |-
+        const char *ladewSoc = id(soc_ladewagen).state.c_str();
         it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0T:%s \ueea0I:%s | \uf015:%s F:%s \U000f0727:%s",
             id(soc_tesla).state.c_str(),
             id(soc_ioniq).state.c_str(),
             id(soc_haus).state.c_str(),
             id(soc_felicity).state.c_str(),
-            id(soc_ladewagen).state.c_str()
+            (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
         );
 
         int x = 10;
@@ -213,7 +215,7 @@ display:
           it.printf(x,125, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
         }
 
-        // Renten in ... Tagen
+        // Rente in ... Tagen
         x += width+15;
         it.printf(x,130, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
 
