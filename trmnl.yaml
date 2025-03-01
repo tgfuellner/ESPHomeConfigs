@@ -221,23 +221,23 @@ display:
             (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
         );
 
-        int x = 10, y = 130;
+        int x = 10, y = 65;
         // Aktueller Strompreis
-        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
-        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
-        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
 
         // Kumulierte Stromkosten des Tages
         x += 135;
-        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
-        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
-        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Tageskosten");
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Tageskosten");
 
         // Kumulierte Stromkosten des Monats
         x += 135;
-        it.filled_rectangle(x,70, 130, 80, COLOR_ON);
-        it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
-        it.printf(x+5,148, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
 
         // Müll in x Tagen
         x += 145;
@@ -246,33 +246,33 @@ display:
         int width;
         if (semicolon != NULL) {
           *semicolon = 0;
-          it.printf(x,115, id(roboto_32), TextAlign::BOTTOM_LEFT, s);
+          it.printf(x,y+45, id(roboto_32), TextAlign::BOTTOM_LEFT, s);
           int x1, y1, height;
-          it.get_text_bounds(x, 115, s, roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width, &height);
+          it.get_text_bounds(x, y+45, s, roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width, &height);
           *semicolon = ';';
 
           if (*(semicolon+1) == '1') {
-            it.rectangle(x-4, 71, width+8, 78, COLOR_ON);
-            it.rectangle(x-3, 72, width+6, 76, COLOR_ON);
-            it.rectangle(x-2, 73, width+4, 74, COLOR_ON);
-            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen");
+            it.rectangle(x-4, y+1, width+8, 78, COLOR_ON);
+            it.rectangle(x-3, y+2, width+6, 76, COLOR_ON);
+            it.rectangle(x-2, y+3, width+4, 74, COLOR_ON);
+            it.printf(x,y+78, id(roboto_32), TextAlign::BOTTOM_LEFT, "morgen");
           } else {
             int width2;
-            it.get_text_bounds(x, 115, "in 0 Tagen", roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width2, &height);
+            it.get_text_bounds(x, y+45, "in 0 Tagen", roboto_32, TextAlign::BOTTOM_LEFT, &x1, &y1, &width2, &height);
             if (width2 > width) width = width2;
-            it.printf(x,148, id(roboto_32), TextAlign::BOTTOM_LEFT, "in %s Tagen", semicolon+1);
+            it.printf(x,y+78, id(roboto_32), TextAlign::BOTTOM_LEFT, "in %s Tagen", semicolon+1);
           }
-          it.rectangle(x-5, 70, width+10, 80, COLOR_ON);
+          it.rectangle(x-5, y, width+10, 80, COLOR_ON);
         } else {
-          it.printf(x,125, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
+          it.printf(x,y+55, id(roboto_14), TextAlign::BOTTOM_LEFT, s);
         }
 
         // Rente in ... Tagen
         x += width+15;
-        it.printf(x,130, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
+        it.printf(x,y+60, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
 
         // Agenda
-        x = 10; int y = 195;
+        x = 10; y = 195;
         s = id(agenda).state.c_str();
         char *del;
         do {
