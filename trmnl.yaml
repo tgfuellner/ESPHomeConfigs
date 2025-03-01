@@ -51,9 +51,13 @@ font:
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       "ü",
     ]
-  - id: roboto_48
-    file: gfonts://Roboto
-    size: 48
+  - id: nerd_44
+    file: "fonts/IosevkaTermNerdFontPropo-Medium.ttf"
+    size: 44
+    glyphs: [
+      "0123456789.-¢€",
+      "\U000f0504", # grad Celsius
+    ]
   - id: nerd_32
     file: "fonts/JetBrainsMonoNerdFont-Medium.ttf"
     glyphs: [
@@ -221,26 +225,26 @@ display:
             (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
         );
 
-        int x = 10, y = 65;
+        int x = 5, y = 55;
         // Aktueller Strompreis
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
-        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
+        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
         it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
 
         // Kumulierte Stromkosten des Tages
-        x += 135;
+        x += 132;
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
-        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
+        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
         it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Tageskosten");
 
         // Kumulierte Stromkosten des Monats
-        x += 135;
+        x += 132;
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
-        it.printf(x+5,y+60, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
+        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
         it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
 
         // Müll in x Tagen
-        x += 145;
+        x += 142;
         auto s = id(muell).state.c_str();
         char *semicolon = rindex(s, ';');
         int width;
@@ -272,7 +276,7 @@ display:
         it.printf(x,y+60, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
 
         // Agenda
-        x = 10; y = 195;
+        x = 5; y = 175;
         s = id(agenda).state.c_str();
         char *del;
         do {
@@ -283,6 +287,39 @@ display:
           y += 21;
           s = del+1;
         } while (del != NULL);
+
+        // Temperaturen
+        x = 5; y = 370;
+        // Norden
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_nord).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Norden");
+        // Garage
+        x += 132;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_garage).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Garage");
+        // Terasse
+        x += 132;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_terasse).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Terasse");
+        // Eltern
+        x += 132;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_eltern).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Eltern");
+        // Esstisch
+        x += 132;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_esstisch).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Esstisch");
+        // Boiler
+        x += 132;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_boiler).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Boiler");
+
 
         // Status: Last updated, Battery Voltage
         it.strftime(10, 470, id(roboto_14), TextAlign::BOTTOM_LEFT, "%H:%M", id(esptime).now());
