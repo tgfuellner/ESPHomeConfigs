@@ -102,6 +102,45 @@ sensor:
     internal: true
     state_class: "total" 
     unit_of_measurement: "€"
+
+    # Temperaturen
+  - platform: homeassistant
+    id: temp_nord
+    entity_id: sensor.tempaussennord_temperature
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+  - platform: homeassistant
+    id: temp_garage
+    entity_id: sensor.garagetemp1
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+  - platform: homeassistant
+    id: temp_terasse
+    entity_id: sensor.haus_temperatur
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+  - platform: homeassistant
+    id: temp_eltern
+    entity_id: sensor.tempeltern_temperature
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+  - platform: homeassistant
+    id: temp_esstisch
+    entity_id: sensor.kuechentisch_temperature
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+  - platform: homeassistant
+    id: temp_boiler
+    entity_id: sensor.boiler
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "°C"
+
   - platform: adc
     name: Battery Voltage
     id: battery_voltage
@@ -182,7 +221,7 @@ display:
             (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
         );
 
-        int x = 10;
+        int x = 10, y = 130;
         // Aktueller Strompreis
         it.filled_rectangle(x,70, 130, 80, COLOR_ON);
         it.printf(x+5,130, id(roboto_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
@@ -252,7 +291,7 @@ display:
 deep_sleep:
   run_duration: 30s
   # run_duration: 180s
-  sleep_duration: 10min
+  sleep_duration: 15min
 
 binary_sensor:
   - platform: gpio
