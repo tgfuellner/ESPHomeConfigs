@@ -42,6 +42,12 @@ font:
   - id: roboto_14
     file: gfonts://Roboto
     size: 14
+    glyphs: [
+      "0123456789 ,.+-:",
+      "abcdefghijklmnopqrstuvwxyz",
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+      "Üäöüß",
+    ]
   - id: roboto_32
     file: gfonts://Roboto
     size: 32
@@ -50,6 +56,12 @@ font:
       "abcdefghijklmnopqrstuvwxyz",
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       "ü",
+    ]
+  - id: nerd_80
+    file: "fonts/IosevkaTermNerdFontPropo-Medium.ttf"
+    size: 80
+    glyphs: [
+      "\ue30c",     # Sonne
     ]
   - id: nerd_44
     file: "fonts/IosevkaTermNerdFontPropo-Medium.ttf"
@@ -144,6 +156,26 @@ sensor:
     internal: true
     state_class: "total" 
     unit_of_measurement: "°C"
+
+    # Sonnen Vorhersage
+  - platform: homeassistant
+    id: sun_today
+    entity_id: sensor.solcast_pv_forecast_prognose_heute
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "kWh"
+  - platform: homeassistant
+    id: sun_tomorow
+    entity_id: sensor.solcast_pv_forecast_prognose_morgen
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "kWh"
+  - platform: homeassistant
+    id: sun_aftertomorow
+    entity_id: sensor.solcast_pv_forecast_prognose_tag_3
+    internal: true
+    state_class: "total" 
+    unit_of_measurement: "kWh"
 
   - platform: adc
     name: Battery Voltage
@@ -273,7 +305,7 @@ display:
 
         // Rente in ... Tagen
         x += width+15;
-        it.printf(x,y+60, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s Tage", id(rente).state.c_str());
+        it.printf(x,y+45, id(roboto_32), TextAlign::BOTTOM_LEFT, "%s", id(rente).state.c_str());
 
         // Agenda
         x = 5; y = 175;
@@ -319,6 +351,27 @@ display:
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
         it.printf(x+2,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f\U000f0504", id(temp_boiler).state);
         it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Boiler");
+
+        // Sonnen Prognose
+        x = 5 + 132*5; y = 124;
+        it.printf(x+35,y+15, id(nerd_80), COLOR_ON, TextAlign::BOTTOM_LEFT, "\ue30c"); // Sonne
+        // heute
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+20,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(sun_today).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "heute");
+        it.printf(x+125,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "kWh");
+        // Morgen
+        y += 82;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+20,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(sun_tomorow).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Morgen");
+        it.printf(x+125,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "kWh");
+        // Übermorgen
+        y += 82;
+        it.filled_rectangle(x,y, 130, 80, COLOR_ON);
+        it.printf(x+20,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(sun_aftertomorow).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Ümorgen");
+        it.printf(x+125,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "kWh");
 
 
         // Status: Last updated, Battery Voltage
