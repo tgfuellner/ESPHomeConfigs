@@ -84,7 +84,7 @@ font:
   - id: nerd_20
     file: "fonts/JetBrainsMonoNerdFont-Medium.ttf"
     glyphs: [
-      "0123456789 ,.+-:",
+      "0123456789 ,.+-:!?",
       "abcdefghijklmnopqrstuvwxyz",
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       "äöüß",
