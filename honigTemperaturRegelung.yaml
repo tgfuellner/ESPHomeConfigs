@@ -1,0 +1,71 @@
+esphome:
+  name: d1_mini_heizung
+  platform: ESP8266
+  board: d1_mini
+
+wifi:
+  # ssid: "WLAN"
+  # password: !secret wifi_password
+  ap:
+    ssid: "Honig Heizung AP"
+    password: !secret wifi_password
+
+logger:
+
+# api:
+
+ota:
+  password: "e2b2c51869024ef64b70cb81d438e730"
+  platform: esphome
+
+one_wire:
+  platform: gpio
+  pin: D4
+
+sensor:
+  - platform: dallas_temp
+    # address: 0x28FFxxxxxxxxxxxx # Adresse deines Sensors
+    name: "Temperatur"
+    unit_of_measurement: "°C"
+    id: temperatur_sensor
+    update_interval: 5s
+
+number:
+  - id: soll_temperatur
+    name: "Soll-Temperatur"
+    step: 1
+    max_value: 80
+    min_value: 35
+    initial_value: 40
+    unit_of_measurement: "°C"
+    platform: template
+    optimistic: true
+    on_value:
+      then:
+        - climate.control:
+            id: heizung_regelung
+            target_temperature: !lambda "return x;"
+
+web_server:
+  ota: false
+  version: 1    # 2 und 3 geht auf dem D1-Mini nicht!
+  port: 80
+
+climate:
+  - platform: pid
+    name: "Heizungsregelung"
+    id: heizung_regelung
+    sensor: temperatur_sensor
+    default_target_temperature: 40 °C
+    control_parameters:
+      kp: 10
+      ki: 0.1
+      kd: 50
+    heat_output: pid_output
+
+output:
+  - platform: slow_pwm
+    pin: D2
+    id: pid_output
+    period: 15s
+
