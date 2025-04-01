@@ -79,7 +79,8 @@ text_sensor:
 # https://tatham.blog/2021/02/06/esphome-batteries-deep-sleep-and-over-the-air-updates/
 
 deep_sleep:
-  sleep_duration: 10min
+  run_duration: 30s
+  sleep_duration: 15min
   id: deep_sleep_temphaus
 
 # Will only pick up a value if this device is configured in Home Assistant > Integrations
@@ -93,7 +94,7 @@ script:
   - id: consider_deep_sleep
     mode: queued
     then:
-      - delay: 26s
+      - delay: 36s
       - if:
           condition:
             binary_sensor.is_on: prevent_deep_sleep
