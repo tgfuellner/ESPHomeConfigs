@@ -54,7 +54,7 @@ text_sensor:
     internal: true
   - platform: homeassistant
     id: soc_niu
-    entity_id: sensor.niusoc
+    entity_id: sensor.niu_scooter_roter_roller_batterycharge
     internal: true
   - platform: homeassistant
     id: soc_haus
