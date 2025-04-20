@@ -234,7 +234,8 @@ display:
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew:");
     // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ladew_increasing).state, id(ladew_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_ladewagen).state.c_str());
+    const char * ladeSoc = id(soc_ladewagen).state.c_str();
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", (*ladeSoc == 'u' ? "--" : ladeSoc));
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Haus:");
     // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(haus_increasing).state, id(haus_falling).state));
