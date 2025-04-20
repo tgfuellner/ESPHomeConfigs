@@ -210,13 +210,13 @@ display:
 
   lambda: |-
     it.fill(COLOR_ON);
-    const int x_label = 170;
-    const int x_value = 175;
-    const int y_label = 90;
-    const int y_value = 120;
+    const int x_label = 160;
+    const int x_value = 105;
+    const int y_label = 70;
+    const int y_value = 105;
     const int x2_label = 520;
     const int x2_value = x2_label+5;
-    int line_spacing = 113;
+    int line_spacing = 90;
     int row = 0;
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Tesla:");
