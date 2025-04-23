@@ -61,10 +61,13 @@ text_sensor:
     entity_id: sensor.sonnenbatterie_99688_state_battery_percentage_user
     internal: true
   - platform: homeassistant
+    id: soc_felicity
+    entity_id: sensor.felicity_ess_bat1_soc
+    internal: true
+  - platform: homeassistant
     id: inkplate_battery_voltage
     entity_id: sensor.inkplate_battery_voltage
     internal: true
-
 
     on_value: # Actions to perform once data for the last sensor has been received
       then:
@@ -211,35 +214,34 @@ display:
   lambda: |-
     it.fill(COLOR_ON);
     const int x_label = 160;
-    const int x_value = 105;
+    const int x_value = 247;
     const int y_label = 70;
     const int y_value = 105;
     const int x2_label = 520;
     const int x2_value = x2_label+5;
-    int line_spacing = 90;
+    int line_spacing = 98;
     int row = 0;
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Tesla:");
-    // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(tesla_increasing).state, id(tesla_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_tesla).state.c_str());
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", id(soc_tesla).state.c_str());
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ioniq:");
-    // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ioniq_increasing).state, id(ioniq_falling).state));
     const char * ioniqSoc = id(soc_ioniq).state.c_str();
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", (*ioniqSoc == 'u' ? "--" : ioniqSoc));
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", (*ioniqSoc == 'u' ? "--" : ioniqSoc));
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Roller:");
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_niu).state.c_str());
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", id(soc_niu).state.c_str());
 
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Ladew:");
-    // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(ladew_increasing).state, id(ladew_falling).state));
     const char * ladeSoc = id(soc_ladewagen).state.c_str();
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", (*ladeSoc == 'u' ? "--" : ladeSoc));
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", (*ladeSoc == 'u' ? "--" : ladeSoc));
 
     it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Haus:");
-    // it.printf(x_value, y_value+(line_spacing*row)-20, id(font_icons), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", trendIcon(id(haus_increasing).state, id(haus_falling).state));
-    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s", id(soc_haus).state.c_str());
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", id(soc_haus).state.c_str());
+
+    it.print(x_label, y_label+(line_spacing*row), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Feli:");
+    it.printf(x_value+60, y_value+(line_spacing*row++), id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%s", id(soc_felicity).state.c_str());
 
     it.rectangle(410, 5, 3, 590, COLOR_OFF);
 
