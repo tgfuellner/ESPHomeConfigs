@@ -191,6 +191,10 @@ sensor:
     filters:
       - multiply: 2.0
 
+    on_value: # Actions to perform once data for the last sensor has been received
+      then:
+        - script.execute: all_data_received
+
 text_sensor:
   - platform: homeassistant
     id: agenda
@@ -251,7 +255,7 @@ display:
       lambda: |-
         const char *ladewSoc = id(soc_ladewagen).state.c_str();
         const char *ioniqSoc = id(soc_ioniq).state.c_str();
-        it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0T:%s \ueea0I:%s | \uf015:%s F:%d \U000f0727:%s",
+        it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0 T:%s \ueea0 I:%s | \uf015 :%s F:%d \U000f0727 :%s",
             id(soc_tesla).state.c_str(),
             (strcmp(ioniqSoc, "unknown") == 0) ? "\uf127" : ioniqSoc,
             id(soc_haus).state.c_str(),
