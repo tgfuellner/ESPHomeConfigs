@@ -118,6 +118,11 @@ sensor:
     internal: true
     state_class: "total" 
     unit_of_measurement: "€"
+  - platform: homeassistant
+    id: soc_felicity
+    entity_id: sensor.felicity_ess_bat1_soc
+    internal: true
+    unit_of_measurement: "%"
 
     # Temperaturen
   - platform: homeassistant
@@ -200,10 +205,6 @@ text_sensor:
     entity_id: sensor.muellabfuhr_erding
     internal: true
   - platform: homeassistant
-    id: soc_felicity
-    entity_id: sensor.felicity_ess_bat1_soc
-    internal: true
-  - platform: homeassistant
     id: soc_ladewagen
     entity_id: sensor.ladewagensoc
     internal: true
@@ -249,11 +250,12 @@ display:
     - id: main_page
       lambda: |-
         const char *ladewSoc = id(soc_ladewagen).state.c_str();
-        it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0T:%s \ueea0I:%s | \uf015:%s F:%s \U000f0727:%s",
+        const char *ioniqSoc = id(soc_ioniq).state.c_str();
+        it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0T:%s \ueea0I:%s | \uf015:%s F:%d \U000f0727:%s",
             id(soc_tesla).state.c_str(),
-            id(soc_ioniq).state.c_str(),
+            (strcmp(ioniqSoc, "unknown") == 0) ? "\uf127" : ioniqSoc,
             id(soc_haus).state.c_str(),
-            id(soc_felicity).state.c_str(),
+            int(id(soc_felicity).state),
             (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
         );
 
