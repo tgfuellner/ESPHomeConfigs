@@ -257,7 +257,7 @@ display:
         const char *ioniqSoc = id(soc_ioniq).state.c_str();
         it.printf(10,50, id(nerd_32), TextAlign::BOTTOM_LEFT, "Akkus: \ueea0 T:%s \ueea0 I:%s | \uf015 :%s F:%d \U000f0727 :%s",
             id(soc_tesla).state.c_str(),
-            (strcmp(ioniqSoc, "unknown") == 0) ? "\uf127" : ioniqSoc,
+            (*ioniqSoc == 'u') ? "\uf127" : ioniqSoc,
             id(soc_haus).state.c_str(),
             int(id(soc_felicity).state),
             (strcmp(ladewSoc, "unknown") == 0) ? "\uf127" : ladewSoc
