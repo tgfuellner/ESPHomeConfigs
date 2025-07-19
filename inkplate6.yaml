@@ -96,6 +96,9 @@ script:
             - lambda: |-
                 id(local_battery_voltage) = id(battery_voltage).sample();
             - switch.turn_off: battery_read_mosfet
+            - sensor.template.publish:
+                id: battery_voltage_ha
+                state: !lambda 'return id(local_battery_voltage) * 2;'
             - component.update: inkplate_display
 
 deep_sleep:
@@ -142,6 +145,12 @@ sensor:
     update_interval: never
     attenuation: 12db
     pin: 35
+  - platform: template
+    name: "Inkplate Battery Voltage"
+    id: battery_voltage_ha
+    unit_of_measurement: "V"
+    accuracy_decimals: 2
+    icon: "mdi:battery"
 
 i2c:
 
