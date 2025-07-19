@@ -5,6 +5,22 @@ esphome:
   name: inkplate
   includes:
     - functions.h
+  on_boot:
+    priority: -100
+    then:
+      - globals.set:
+          id: display_updated
+          value: 'false'
+
+globals:
+  - id: display_updated
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+  - id: local_battery_voltage
+    type: float
+    restore_value: no
+    initial_value: '0.0'
 
 esp32:
   board: esp-wrover-kit
@@ -68,8 +84,19 @@ text_sensor:
 script:
   - id: all_data_received
     then:
-      - component.update: inkplate_display
-      # - script.execute: enter_sleep
+      - if:
+          condition:
+            lambda: 'return !id(display_updated);'
+          then:
+            - globals.set:
+                id: display_updated
+                value: 'true'
+            - switch.turn_on: battery_read_mosfet
+            - delay: 2ms
+            - lambda: |-
+                id(local_battery_voltage) = id(battery_voltage).sample();
+            - switch.turn_off: battery_read_mosfet
+            - component.update: inkplate_display
 
 deep_sleep:
   run_duration: 30s
@@ -110,26 +137,11 @@ sensor:
     id: soc_felicity
     entity_id: sensor.felicity_ess_bat1_soc
     internal: true
-  - platform: homeassistant
-    id: inkplate_battery_voltage
-    entity_id: sensor.inkplate_battery_voltage
-    internal: true
   - platform: adc
     id: battery_voltage
     update_interval: never
     attenuation: 12db
     pin: 35
-  - platform: template
-    name: "Inkplate Battery Voltage"
-    device_class: VOLTAGE
-    lambda: |-
-      id(battery_read_mosfet).turn_on();
-      delay(1);
-      float adc = id(battery_voltage).sample();
-      id(battery_read_mosfet).turn_off();
-      return adc;
-    filters:
-      - multiply: 2
 
 i2c:
 
@@ -176,8 +188,8 @@ font:
     id: font_icons
     size: 65
     glyphs:
-    - "\U000F072E" # Down
-    - "\U000F0737" # Up
+    - "󰜮" # Down
+    - "󰜷" # Up
 
 
 display:
@@ -261,4 +273,4 @@ display:
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
     //it.printf(800, 0, id(helvetica_24), COLOR_OFF, TextAlign::TOP_RIGHT, "%sV", id(inkplate_battery_voltage).state.c_str());
-    it.printf(800, 0, id(helvetica_24), COLOR_OFF, TextAlign::TOP_RIGHT, "%.2fV", id(inkplate_battery_voltage).state);
+    it.printf(800, 0, id(helvetica_24), COLOR_OFF, TextAlign::TOP_RIGHT, "%.2fV", id(local_battery_voltage) * 2);
