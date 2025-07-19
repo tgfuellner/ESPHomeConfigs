@@ -81,7 +81,7 @@ font:
       "\uf127", # No link
     ]
     size: 32
-  - id: nerd_20
+  - id: nerd_agenda
     file: "fonts/JetBrainsMonoNerdFont-Medium.ttf"
     glyphs: [
       "0123456789 ,.+-:!?",
@@ -89,7 +89,7 @@ font:
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
       "äöüß",
     ]
-    size: 20
+    size: 26
 
 spi:
   mosi_pin: GPIO8
@@ -320,9 +320,9 @@ display:
         do {
           del = index(s, '~');
           if (del != NULL) *del = 0;
-          it.printf(x,y, id(nerd_20), TextAlign::BOTTOM_LEFT, "%s", s);
+          it.printf(x,y, id(nerd_agenda), TextAlign::BOTTOM_LEFT, "%s", s);
           if (del != NULL) *del = '~';
-          y += 21;
+          y += 25;
           s = del+1;
         } while (del != NULL);
 
