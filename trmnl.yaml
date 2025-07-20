@@ -193,6 +193,7 @@ sensor:
     pin: GPIO3
     attenuation: 12db
     samples: 128
+    update_interval: never
     filters:
       - multiply: 2.0
 
@@ -233,6 +234,8 @@ text_sensor:
 script:
   - id: all_data_received
     then:
+      - component.update: battery_voltage
+      - delay: 50ms
       - component.update: trmnl_display
 
 display:
