@@ -6,6 +6,11 @@ esphome:
   # Automatically add the mac address to the name
   # so you can use a single firmware for all devices
   #name_add_mac_suffix: true
+  on_boot:
+    priority: -100
+    then:
+      - delay: 20s
+      - script.execute: all_data_received
 
 esp32:
   board: esp32-c3-devkitm-1
@@ -191,10 +196,6 @@ sensor:
     filters:
       - multiply: 2.0
 
-    on_value: # Actions to perform once data for the last sensor has been received
-      then:
-        - script.execute: all_data_received
-
 text_sensor:
   - platform: homeassistant
     id: agenda
@@ -228,10 +229,6 @@ text_sensor:
     id: soc_haus
     entity_id: sensor.sonnenbatterie_99688_state_battery_percentage_user
     internal: true
-
-    on_value: # Actions to perform once data for the last sensor has been received
-      then:
-        - script.execute: all_data_received
 
 script:
   - id: all_data_received
@@ -396,4 +393,3 @@ binary_sensor:
     pin:
       number: GPIO9
       inverted: true
-
