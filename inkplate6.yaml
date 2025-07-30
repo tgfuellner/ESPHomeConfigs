@@ -24,6 +24,7 @@ globals:
 
 esp32:
   board: esp-wrover-kit
+  cpu_frequency: 240MHz
 
 logger:
 
