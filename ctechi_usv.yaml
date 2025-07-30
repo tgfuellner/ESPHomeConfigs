@@ -10,8 +10,9 @@ esphome:
           condition:
             binary_sensor.is_off: i80_pin
           then:
-            - switch.turn_off: usv_relay
-            - logger.log: "Boot: i80 ist FALSE, LED an. USV Relay AUSGESCHALTET."
+            # Starte die 30-minütige Sperre, anstatt nur das Relais auszuschalten
+            - script.execute: start_charge_lockout
+            - logger.log: "Boot: i80 ist FALSE, LED an. USV Relay AUSGESCHALTET und 30min Sperre gestartet."
           else: # Nur wenn i80 NICHT FALSE ist, prüfen wir i60
             - if:
               # Bedingung 2: Wenn i60 TRUE ist, schalte das Relais EIN
@@ -49,6 +50,17 @@ api:
     key: !secret api_encryption_key
 logger:
 
+# Script für die 30-minütige Ausschaltsperre
+script:
+  - id: start_charge_lockout
+    # 'restart' sorgt dafür, dass bei erneutem Auslösen der Timer von vorne beginnt.
+    mode: restart
+    then:
+      - switch.turn_off: usv_relay
+      - logger.log: "Laden gestoppt. Starte 30-minütige Sperre."
+      - delay: 30min
+      - logger.log: "30-minütige Sperre beendet. Laden ist wieder erlaubt."
+
 
 # --- Komponenten ---
 
@@ -67,8 +79,15 @@ binary_sensor:
     # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
     # Die i60 LED geht aus
     on_press:
-      - switch.turn_on: usv_relay
-      - logger.log: "i60 LED ist ausgegangen --> lade"
+      - if:
+          # Hinzugefügte Bedingung: Nur ausführen, wenn die Sperre nicht aktiv ist.
+          condition:
+            script.is_not_running: start_charge_lockout
+          then:
+            - switch.turn_on: usv_relay
+            - logger.log: "i60 LED ist ausgegangen --> lade"
+          else:
+            - logger.log: "Versuch zu laden, aber die 30-Minuten-Sperre ist aktiv. Aktion ignoriert."
 
   # Sensor zum AUSSCHALTEN des Relais
   - platform: gpio
@@ -82,8 +101,8 @@ binary_sensor:
     # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
     # Die i80 LED geht an
     on_release:
-      - switch.turn_off: usv_relay
-      - logger.log: "i80 LED ist eingegangen --> stoppe laden"
+      # Ersetzt den direkten Befehl durch den Aufruf des Scripts
+      - script.execute: start_charge_lockout
 
 # 2. Schalter (Dein Relais)
 switch:
