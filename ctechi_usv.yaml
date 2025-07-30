@@ -1,0 +1,95 @@
+esphome:
+  name: ctechi-usv
+  friendly_name: Ctechi USV
+  on_boot:
+    priority: -100
+    then:
+      - delay: 0.5s
+      - if:
+          # Bedingung 1 (höhere Priorität): Wenn i80 FALSE ist (d.h. LED an), schalte das Relais AUS
+          condition:
+            binary_sensor.is_off: i80_pin
+          then:
+            - switch.turn_off: usv_relay
+            - logger.log: "Boot: i80 ist FALSE, LED an. USV Relay AUSGESCHALTET."
+          else: # Nur wenn i80 NICHT FALSE ist, prüfen wir i60
+            - if:
+              # Bedingung 2: Wenn i60 TRUE ist, schalte das Relais EIN
+                condition:
+                  binary_sensor.is_on: i60_pin
+                then:
+                  - switch.turn_on: usv_relay
+                  - logger.log: "Boot: i60 ist TRUE, LED aus. USV Relay EINGESCHALTET."
+                else:
+                  # Optional: Was tun, wenn weder i80 FALSE noch i60 TRUE ist?
+                  # Hier bleibt es im Standardzustand (oft AUS, da kein 'turn_on' Befehl gesendet wurde)
+                  # Oder explizit setzen:
+                  - switch.turn_on: usv_relay # Sicherer Standard: Ein
+                  - logger.log: "Boot: Weder i80 FALSE noch i60 TRUE. USV Relay standardmäßig EIN."
+
+esp8266:
+  board: d1_mini
+
+wifi:
+  networks:
+  - ssid: WLAN
+    password: !secret wifi_password
+
+  # Set up a wifi access point using the device name above
+  ap:
+
+# In combination with the `ap` this allows the user
+# to provision wifi credentials to the device.
+captive_portal:
+
+ota:
+  platform: esphome
+api:
+  encryption:
+    key: !secret api_encryption_key
+logger:
+
+
+# --- Komponenten ---
+
+# 1. Binäre Sensoren (Deine Eingänge)
+binary_sensor:
+  # Sensor zum EINSCHALTEN des Relais
+  - platform: gpio
+    pin:
+      # Passe den Pin an deine Schaltung an (z.B. D5)
+      number: D5
+      # Nutzt den internen Pullup-Widerstand
+      mode: INPUT_PULLUP
+    name: "i60 LED"
+    id: i60_pin
+    # Automation: Wenn der Sensor auf 'true' geht, schalte das Relais EIN.
+    # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
+    # Die i60 LED geht aus
+    on_press:
+      - switch.turn_on: usv_relay
+      - logger.log: "i60 LED ist ausgegangen --> lade"
+
+  # Sensor zum AUSSCHALTEN des Relais
+  - platform: gpio
+    pin:
+      # Passe den Pin an deine Schaltung an (z.B. D6)
+      number: D6
+      mode: INPUT_PULLUP
+    name: "i80 LED"
+    id: i80_pin
+    # Automation: Wenn der Sensor auf 'false' geht, schalte das Relais AUS.
+    # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
+    # Die i80 LED geht an
+    on_release:
+      - switch.turn_off: usv_relay
+      - logger.log: "i80 LED ist eingegangen --> stoppe laden"
+
+# 2. Schalter (Dein Relais)
+switch:
+  - platform: gpio
+    # Passe den Pin an deine Schaltung an (z.B. D1)
+    pin: D1
+    name: "Charge Relais"
+    # ID, um das Relais in den Automationen anzusprechen
+    id: usv_relay
