@@ -90,6 +90,7 @@ switch:
   - platform: gpio
     # Passe den Pin an deine Schaltung an (z.B. D1)
     pin: D1
+    inverted: true
     name: "Charge Relais"
     # ID, um das Relais in den Automationen anzusprechen
     id: usv_relay
