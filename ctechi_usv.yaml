@@ -4,7 +4,7 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - delay: 0.5s
+      - delay: 30s
       - if:
           # Bedingung 1 (höhere Priorität): Wenn i80 FALSE ist (d.h. LED an), schalte das Relais AUS
           condition:
@@ -76,7 +76,7 @@ binary_sensor:
     name: "i60 LED"
     id: i60_pin
     filters:
-      - delayed_on: 30s
+      - delayed_on: 1s
     # Automation: Wenn der Sensor auf 'true' geht, schalte das Relais EIN.
     # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
     # Die i60 LED geht aus
@@ -100,7 +100,7 @@ binary_sensor:
     name: "i80 LED"
     id: i80_pin
     filters:
-      - delayed_off: 30s
+      - delayed_off: 1s
     # Automation: Wenn der Sensor auf 'false' geht, schalte das Relais AUS.
     # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
     # Die i80 LED geht an
