@@ -75,6 +75,8 @@ binary_sensor:
       mode: INPUT_PULLUP
     name: "i60 LED"
     id: i60_pin
+    filters:
+      - delayed_on: 30s
     # Automation: Wenn der Sensor auf 'true' geht, schalte das Relais EIN.
     # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
     # Die i60 LED geht aus
@@ -97,6 +99,8 @@ binary_sensor:
       mode: INPUT_PULLUP
     name: "i80 LED"
     id: i80_pin
+    filters:
+      - delayed_off: 30s
     # Automation: Wenn der Sensor auf 'false' geht, schalte das Relais AUS.
     # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
     # Die i80 LED geht an
