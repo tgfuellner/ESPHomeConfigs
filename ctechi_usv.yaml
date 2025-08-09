@@ -1,32 +1,6 @@
 esphome:
   name: ctechi-usv
   friendly_name: Ctechi USV
-  on_boot:
-    priority: -100
-    then:
-      - delay: 30s
-      - if:
-          # Bedingung 1 (höhere Priorität): Wenn i80 FALSE ist (d.h. LED an), schalte das Relais AUS
-          condition:
-            binary_sensor.is_off: i80_pin
-          then:
-            # Starte die 30-minütige Sperre, anstatt nur das Relais auszuschalten
-            - script.execute: start_charge_lockout
-            - logger.log: "Boot: i80 ist FALSE, LED an. USV Relay AUSGESCHALTET und 30min Sperre gestartet."
-          else: # Nur wenn i80 NICHT FALSE ist, prüfen wir i60
-            - if:
-              # Bedingung 2: Wenn i60 TRUE ist, schalte das Relais EIN
-                condition:
-                  binary_sensor.is_on: i60_pin
-                then:
-                  - switch.turn_on: usv_relay
-                  - logger.log: "Boot: i60 ist TRUE, LED aus. USV Relay EINGESCHALTET."
-                else:
-                  # Optional: Was tun, wenn weder i80 FALSE noch i60 TRUE ist?
-                  # Hier bleibt es im Standardzustand (oft AUS, da kein 'turn_on' Befehl gesendet wurde)
-                  # Oder explizit setzen:
-                  - switch.turn_on: usv_relay # Sicherer Standard: Ein
-                  - logger.log: "Boot: Weder i80 FALSE noch i60 TRUE. USV Relay standardmäßig EIN."
 
 esp8266:
   board: d1_mini
@@ -50,19 +24,36 @@ api:
     key: !secret api_encryption_key
 logger:
 
-# Script für die 30-minütige Ausschaltsperre
+# Script für die 3-minütige Ausschaltsperre
 script:
   - id: start_charge_lockout
     # 'restart' sorgt dafür, dass bei erneutem Auslösen der Timer von vorne beginnt.
     mode: restart
     then:
       - switch.turn_off: usv_relay
-      - logger.log: "Laden gestoppt. Starte 30-minütige Sperre."
-      - delay: 30min
-      - logger.log: "30-minütige Sperre beendet. Laden ist wieder erlaubt."
+      - logger.log: "Laden gestoppt. Starte 3-minütige Sperre."
+      - delay: 3min
+      - logger.log: "3-minütige Sperre beendet. Laden ist wieder erlaubt."
 
 
 # --- Komponenten ---
+
+# Mit 1.2M Ohm auf den A0 des Wemos D1 Mini. Auf dem Mini ist bereits ein Spannungsteiler!
+sensor:
+  - platform: adc
+    pin: A0
+    name: "BatterieSpannung"
+    update_interval: 30s
+    samples: 5
+    filters:
+      - multiply: 15.141
+    on_value_range:
+      - below: 13.1
+        then:
+          - switch.turn_on: usv_relay
+      - above: 13.5
+        then:
+          - switch.turn_off: usv_relay
 
 # 1. Binäre Sensoren (Deine Eingänge)
 binary_sensor:
@@ -76,20 +67,24 @@ binary_sensor:
     name: "i60 LED"
     id: i60_pin
     filters:
-      - delayed_on: 1s
-    # Automation: Wenn der Sensor auf 'true' geht, schalte das Relais EIN.
-    # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
-    # Die i60 LED geht aus
-    on_press:
-      - if:
-          # Hinzugefügte Bedingung: Nur ausführen, wenn die Sperre nicht aktiv ist.
-          condition:
-            script.is_not_running: start_charge_lockout
-          then:
-            - switch.turn_on: usv_relay
-            - logger.log: "i60 LED ist ausgegangen --> lade"
-          else:
-            - logger.log: "Versuch zu laden, aber die 30-Minuten-Sperre ist aktiv. Aktion ignoriert."
+      - invert:
+    #   # Laden wird durch blinkede LED angezeigt!
+    #   - delayed_on: 20s
+    #   - delayed_off: 20s
+    # # Automation: Wenn der Sensor auf 'true' geht, schalte das Relais EIN.
+    # # 'on_press' wird ausgelöst, wenn der Zustand von OFF zu ON wechselt.
+    # # Die i60 LED geht aus
+    # on_press:
+    #   - if:
+    #       # Hinzugefügte Bedingung: Nur ausführen, wenn die Sperre nicht aktiv ist.
+    #       condition:
+    #         not:
+    #           script.is_running: start_charge_lockout
+    #       then:
+    #         - switch.turn_on: usv_relay
+    #         - logger.log: "i60 LED ist ausgegangen --> lade"
+    #       else:
+    #         - logger.log: "Versuch zu laden, aber die 3-Minuten-Sperre ist aktiv. Aktion ignoriert."
 
   # Sensor zum AUSSCHALTEN des Relais
   - platform: gpio
@@ -100,15 +95,16 @@ binary_sensor:
     name: "i80 LED"
     id: i80_pin
     filters:
-      - delayed_off: 1s
-    # Automation: Wenn der Sensor auf 'false' geht, schalte das Relais AUS.
-    # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
-    # Die i80 LED geht an
-    on_release:
-      # Ersetzt den direkten Befehl durch den Aufruf des Scripts
-      - script.execute: start_charge_lockout
+      - invert:
+    #   - delayed_on: 20s
+    #   - delayed_off: 20s
+    # # Automation: Wenn der Sensor auf 'false' geht, schalte das Relais AUS.
+    # # 'on_release' wird ausgelöst, wenn der Zustand von ON zu OFF wechselt.
+    # # Die i80 LED geht an
+    # on_release:
+    #   # Ersetzt den direkten Befehl durch den Aufruf des Scripts
+    #   - script.execute: start_charge_lockout
 
-# 2. Schalter (Dein Relais)
 switch:
   - platform: gpio
     # Passe den Pin an deine Schaltung an (z.B. D1)
