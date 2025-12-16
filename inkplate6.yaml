@@ -25,6 +25,9 @@ globals:
 esp32:
   board: esp-wrover-kit
   cpu_frequency: 240MHz
+  framework:
+    type: arduino
+  # framework: esp-idf
 
 logger:
 
@@ -47,7 +50,7 @@ text_sensor:
     internal: true
   - platform: homeassistant
     id: strom_preis
-    entity_id: sensor.pyramoos_12_strompreis
+    entity_id: sensor.epex_spot_data_market_price
     internal: true
   - platform: homeassistant
     id: temperatur_nord
@@ -202,8 +205,10 @@ font:
     - "󰜷" # Up
 
 
+psram:
+  
 display:
-- platform: inkplate6
+- platform: inkplate
   id: inkplate_display
   greyscale: false
   partial_updating: false
@@ -278,7 +283,9 @@ display:
     it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s°C", id(temperatur_boiler).state.c_str());
     row++;
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Strom:");
-    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%s EUR", id(strom_preis).state.c_str());
+
+    float preis_als_zahl = atof(id(strom_preis).state.c_str());
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f EUR", preis_als_zahl);
 
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
