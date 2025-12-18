@@ -26,8 +26,8 @@ esp32:
   board: esp-wrover-kit
   cpu_frequency: 240MHz
   framework:
-    type: arduino
-  # framework: esp-idf
+    # type: arduino
+    type: esp-idf
 
 logger:
 
@@ -285,7 +285,7 @@ display:
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Strom:");
 
     float preis_als_zahl = atof(id(strom_preis).state.c_str());
-    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f EUR", preis_als_zahl);
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.3f EUR", preis_als_zahl);
 
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
