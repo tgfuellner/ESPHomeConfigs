@@ -107,22 +107,22 @@ time:
 sensor:
   - platform: homeassistant
     id: strom_preis
-    entity_id: sensor.pyramoos_12_strompreis
+    entity_id: sensor.epex_spot_data_market_price
     internal: true
     state_class: "total" 
     unit_of_measurement: "€"
   - platform: homeassistant
-    id: tageskosten
-    entity_id: sensor.tibber_pulse_pyramoos_12_kumulierte_kosten
+    id: einkauf
+    entity_id: sensor.stromeinkauf
     internal: true
     state_class: "total" 
-    unit_of_measurement: "€"
+    unit_of_measurement: "kWh"
   - platform: homeassistant
-    id: monatskosten
-    entity_id: sensor.pyramoos_12_monatliche_kosten
+    id: verkauf
+    entity_id: sensor.stromverkauf
     internal: true
     state_class: "total" 
-    unit_of_measurement: "€"
+    unit_of_measurement: "kWh"
   - platform: homeassistant
     id: soc_felicity
     entity_id: sensor.felicity_ess_bat1_soc
@@ -269,17 +269,17 @@ display:
         it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f¢", id(strom_preis).state * 100);
         it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "kWh Preis");
 
-        // Kumulierte Stromkosten des Tages
+        // Vom Netz importierte Energie des Tages
         x += 132;
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
-        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.2f€", id(tageskosten).state);
-        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Tageskosten");
+        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(einkauf).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Einkauf kWh");
 
-        // Kumulierte Stromkosten des Monats
+        // Ins Netzt exportierte Energie des Tages
         x += 132;
         it.filled_rectangle(x,y, 130, 80, COLOR_ON);
-        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f€", id(monatskosten).state);
-        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Monatskosten");
+        it.printf(x+5,y+60, id(nerd_44), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f", id(verkauf).state);
+        it.printf(x+5,y+78, id(roboto_14), COLOR_OFF, TextAlign::BOTTOM_LEFT, "Verkauf kWh");
 
         // Müll in x Tagen
         x += 142;
