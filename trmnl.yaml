@@ -15,8 +15,8 @@ esphome:
 esp32:
   board: esp32-c3-devkitm-1
   framework:
-    type: arduino
-    #type: esp-idf
+    # type: arduino
+    type: esp-idf
 
 # To be able to get logs from the device via serial and api.
 logger:
@@ -107,6 +107,7 @@ time:
 sensor:
   - platform: homeassistant
     id: strom_preis
+    # entity_id: sensor.pyramoos_12_strompreis
     entity_id: sensor.epex_spot_data_market_price
     internal: true
     state_class: "total" 

@@ -284,8 +284,8 @@ display:
     row++;
     it.print(x2_label, y_label+(line_spacing*row)-15, id(helvetica_24), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "Strom:");
 
-    float preis_als_zahl = atof(id(strom_preis).state.c_str());
-    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.3f EUR", preis_als_zahl);
+    float preis_als_zahl = atof(id(strom_preis).state.c_str()) * 100;
+    it.printf(x2_value, y_label+(line_spacing*row++), id(helvetica_48), COLOR_OFF, TextAlign::BOTTOM_LEFT, "%.1f Cent", preis_als_zahl);
 
     it.strftime(800, 600, id(helvetica_96), COLOR_OFF, TextAlign::BOTTOM_RIGHT, "%H:%M", id(esptime).now());
 
