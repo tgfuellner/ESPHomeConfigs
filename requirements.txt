@@ -1,1 +1,3 @@
 esphome
+fatfs-ng
+littlefs-python
