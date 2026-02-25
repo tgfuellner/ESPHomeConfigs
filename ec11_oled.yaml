@@ -82,6 +82,9 @@ binary_sensor:
       mode: INPUT_PULLUP
       inverted: true
     name: "Encoder Klick"
+    on_state:
+      then:
+        - component.update: mein_display
 
 display:
   - platform: ssd1306_i2c
