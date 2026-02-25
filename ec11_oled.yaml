@@ -1,0 +1,100 @@
+# Test Oled EC11 Rotary Encoder
+#
+ 
+esphome:
+  name: oled-ec11
+
+esp8266:
+  board: d1_mini
+
+globals:
+  - id: wlan_bereit
+    type: bool
+    restore_value: no
+    initial_value: 'false'
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  platform: esphome
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  fast_connect: true
+  power_save_mode: none # Verhindert, dass das WLAN-Modul schlafen geht
+  #min_auth_mode: WPA2
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Oled_EC11"
+    password: "Bk1Ovr90Ycl9"
+
+  on_connect:
+    then:
+      - globals.set:
+          id: wlan_bereit
+          value: 'true'
+
+
+i2c:
+  sda: D2 # 4
+  scl: D1 # 5
+  frequency: 800kHz
+
+font:
+  - file: "gfonts://Open Sans"
+    id: my_font
+    size: 16
+
+sensor:
+  - platform: rotary_encoder
+    id: mein_encoder
+    pin_a: 
+      number: D5 # 14
+      mode: INPUT_PULLUP
+    pin_b: 
+      number: D6 # 12
+      mode: INPUT_PULLUP
+    name: "Encoder Wert"
+
+   # Probiere hier 2 oder 4, falls er bei einem Klick 2-4 Schritte macht
+    resolution: 1 
+    # Ein Filter hilft, extrem kurze Störimpulse zu ignorieren
+    filters:
+      - debounce: 20ms
+    # Optional: Aktionen direkt beim Drehen auslösen
+    on_value:
+      then:
+        - component.update: mein_display
+
+binary_sensor:
+  - platform: gpio
+    id: encoder_button
+    pin: 
+      number: D7 # 13
+      mode: INPUT_PULLUP
+      inverted: true
+    name: "Encoder Klick"
+
+display:
+  - platform: ssd1306_i2c
+    id: mein_display
+    model: "SH1106 128x64"
+    address: 0x3C
+    lambda: |-
+      if (id(wlan_bereit)) {
+        it.print(0, 0, id(my_font), "System Aktiv");
+        it.printf(0, 30, id(my_font), "Wert: %.0f", id(mein_encoder).state);
+      
+        if (id(encoder_button).state) {
+           it.print(0, 50, id(my_font), "Button: GEDRÜCKT");
+        }
+      }
+
