@@ -91,10 +91,10 @@ display:
     lambda: |-
       if (id(wlan_bereit)) {
         it.print(0, 0, id(my_font), "System Aktiv");
-        it.printf(0, 30, id(my_font), "Wert: %.0f", id(mein_encoder).state);
+        it.printf(10, 25, id(my_font), "Wert: %.0f", id(mein_encoder).state);
       
         if (id(encoder_button).state) {
-           it.print(0, 50, id(my_font), "Button: GEDRÜCKT");
+           it.print(0, 40, id(my_font), "Button");
         }
       }
 
