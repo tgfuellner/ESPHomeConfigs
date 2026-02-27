@@ -27,3 +27,4 @@
 # venv aktualisieren:
 - `uv pip install -r requirements.txt --upgrade`
 - `uv pip show esphome`
+- `uv pip freeze>freeze2`
