@@ -48,6 +48,10 @@ i2c:
   scl: D1 # 5
   frequency: 800kHz
 
+one_wire:
+  platform: gpio
+  pin: D4 # GPIO2
+
 font:
   - file: "gfonts://Open Sans"
     id: my_font
@@ -63,7 +67,6 @@ sensor:
       number: D6 # 12
       mode: INPUT_PULLUP
     name: "Encoder Wert"
-
    # Probiere hier 2 oder 4, falls er bei einem Klick 2-4 Schritte macht
     resolution: 1 
     # Ein Filter hilft, extrem kurze Störimpulse zu ignorieren
@@ -73,6 +76,15 @@ sensor:
     on_value:
       then:
         - component.update: mein_display
+
+    
+  - platform: dallas_temp
+    address: 0xbf3c01d0757d3f28 # Wird nach dem ersten Boot im Log angezeigt
+    name: "Temperatur"
+    id: temp
+    update_interval: 10s
+    unit_of_measurement: "°C"
+    accuracy_decimals: 1
 
 binary_sensor:
   - platform: gpio
@@ -97,7 +109,10 @@ display:
         it.printf(10, 25, id(my_font), "Wert: %.0f", id(mein_encoder).state);
       
         if (id(encoder_button).state) {
-           it.print(0, 40, id(my_font), "Button");
+           it.print(0, 40, id(my_font), "On");
+        }
+
+        if (id(temp).has_state()) {
+          it.printf(45, 40, id(my_font), "T: %.1f°C", id(temp).state);
         }
       }
-
