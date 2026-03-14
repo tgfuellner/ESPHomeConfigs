@@ -3,7 +3,13 @@
  
 esphome:
   name: oled-ec11
-
+  on_boot:
+      priority: -100
+      then:
+        - sensor.rotary_encoder.set_value:
+            id: mein_encoder
+            value: 30.0 # Standard-Sollwert beim Einschalten
+            
 esp8266:
   board: d1_mini
 
@@ -12,6 +18,23 @@ globals:
     type: bool
     restore_value: no
     initial_value: 'false'
+
+script:
+  - id: thermostat_logik
+    then:
+      # Bedingung 1: Ist-Temperatur >= Soll-Temperatur -> Relais AUS
+      - if:
+          condition:
+            lambda: 'return id(temp).state >= id(mein_encoder).state;'
+          then:
+            - switch.turn_off: relais
+            
+      # Bedingung 2: Ist-Temperatur <= (Soll-Temperatur - 1 Grad) -> Relais AN
+      - if:
+          condition:
+            lambda: 'return id(temp).state <= (id(mein_encoder).state - 1.0);'
+          then:
+            - switch.turn_on: relais
 
 # Enable logging
 logger:
@@ -66,18 +89,20 @@ sensor:
     pin_b: 
       number: D6 # 12
       mode: INPUT_PULLUP
-    name: "Encoder Wert"
+    name: "Stell Temperatur"
+    unit_of_measurement: "°C"
    # Probiere hier 2 oder 4, falls er bei einem Klick 2-4 Schritte macht
     resolution: 1 
     # Ein Filter hilft, extrem kurze Störimpulse zu ignorieren
     filters:
       - debounce: 20ms
-    # Optional: Aktionen direkt beim Drehen auslösen
+    min_value: 10
+    max_value: 50
     on_value:
       then:
+        - script.execute: thermostat_logik # Prüft das Relais beim Drehen
         - component.update: mein_display
 
-    
   - platform: dallas_temp
     address: 0xbf3c01d0757d3f28 # Wird nach dem ersten Boot im Log angezeigt
     name: "Temperatur"
@@ -85,6 +110,10 @@ sensor:
     update_interval: 10s
     unit_of_measurement: "°C"
     accuracy_decimals: 1
+    on_value:
+      then:
+        - script.execute: thermostat_logik # Prüft das Relais bei neuer Temperatur
+        - component.update: mein_display
 
 binary_sensor:
   - platform: gpio
@@ -97,6 +126,19 @@ binary_sensor:
     on_state:
       then:
         - component.update: mein_display
+    on_press:
+      then:
+        - switch.toggle: relais
+
+switch:
+  - platform: gpio
+    pin:
+      number: D0
+      inverted: true
+    id: relais
+    name: "Relais"
+    # ALWAYS_OFF stellt sicher, dass das Relais nach einem Stromausfall sicherheitshalber AUS bleibt
+    restore_mode: ALWAYS_OFF
 
 display:
   - platform: ssd1306_i2c
@@ -105,14 +147,16 @@ display:
     address: 0x3C
     lambda: |-
       if (id(wlan_bereit)) {
-        it.print(0, 0, id(my_font), "System Aktiv");
-        it.printf(10, 25, id(my_font), "Wert: %.0f", id(mein_encoder).state);
+        it.printf(0, 0, id(my_font), "T set: %.0f°C", id(mein_encoder).state);
+        if (id(temp).has_state()) {
+          it.printf(0, 23, id(my_font), "T cur: %.1f°C", id(temp).state);
+        }
       
-        if (id(encoder_button).state) {
-           it.print(0, 40, id(my_font), "On");
+        // Relais Status anzeigen
+        if (id(relais).state) {
+           it.print(0, 45, id(my_font), "Relais: AN");
+        } else {
+           it.print(0, 45, id(my_font), "Relais: AUS");
         }
 
-        if (id(temp).has_state()) {
-          it.printf(45, 40, id(my_font), "T: %.1f°C", id(temp).state);
-        }
       }
