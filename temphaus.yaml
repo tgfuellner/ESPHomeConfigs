@@ -7,6 +7,7 @@
 esphome:
   name: temphaus
   on_boot:
+    priority: -100
     then:
       - script.execute: consider_deep_sleep
 
@@ -14,7 +15,9 @@ esp8266:
   board: esp12e
 
 # Enable logging
+#logger:
 logger:
+  level: WARN
 
 # Enable Home Assistant API
 api:
@@ -28,13 +31,14 @@ ota:
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  fast_connect: true
 
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
     ssid: "Temphaus Fallback Hotspot"
-    password: "Bk1Ovr90Ycl9"
+    password: "Bld1Ovr90Ycl9"
 
-captive_portal:
+#captive_portal:
 
 
 
@@ -58,6 +62,10 @@ sensor:
     #address: 0x1d3c01d075e7fe28
     name: "Haus Temperatur"
     update_interval: 5s
+    # ging nicht update_interval: never   # wir triggern manuell
+    force_update: true
+    resolution: 9    # Standart ist 12. 9 reicht und braucht weniger Strom
+    id: temp_sensor
 
   - platform: wifi_signal
     name: "temphouse WiFi Signal"
@@ -79,7 +87,7 @@ text_sensor:
 # https://tatham.blog/2021/02/06/esphome-batteries-deep-sleep-and-over-the-air-updates/
 
 deep_sleep:
-  run_duration: 30s
+  # run_duration: 30s
   sleep_duration: 15min
   id: deep_sleep_temphaus
 
@@ -94,12 +102,19 @@ script:
   - id: consider_deep_sleep
     mode: queued
     then:
-      - delay: 36s
+      # ging nicht - component.update: temp_sensor
+      - wait_until:
+          condition:
+            api.connected:
+          timeout: 25s            # maximal 25 s warten
+      - delay: 10s                 # Zeit zum Senden der Werte
       - if:
           condition:
             binary_sensor.is_on: prevent_deep_sleep
           then:
-            - logger.log: 'Skipping sleep, per prevent_deep_sleep'
+            - logger.log: "Skipping sleep (prevent_deep_sleep aktiv)"
           else:
             - deep_sleep.enter: deep_sleep_temphaus
+      # Falls prevent aktiv bleibt, prüft er alle 30 s erneut
+      - delay: 30s
       - script.execute: consider_deep_sleep
