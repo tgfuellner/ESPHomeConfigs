@@ -1,0 +1,157 @@
+# Zeigt Homeassistant Sensoren auf einem CYD 3.5 an (ESP32-3248S035)
+# 
+esphome:
+  name: cyd35
+  friendly_name: cyd35
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+
+wifi:
+  ssid: WLAN
+  password: !secret wifi_password
+  ap:
+    ssid: "Cyd35 Fallback"
+
+captive_portal:
+
+spi:
+  - id: tft
+    clk_pin: 14
+    mosi_pin: 13
+    miso_pin:
+      number: 12
+      ignore_strapping_warning: true
+
+output:
+  - id: backlight_pwm
+    platform: ledc
+    pin: GPIO27
+  - id: output_red
+    platform: ledc
+    pin: 4
+    inverted: true
+  - id: output_green
+    platform: ledc
+    pin: 16
+    inverted: true
+  - id: output_blue
+    platform: ledc
+    pin: 17
+    inverted: true
+
+light:
+  - id: backlight
+    platform: monochromatic
+    output: backlight_pwm
+    name: "Display Backlight"
+    restore_mode: ALWAYS_ON
+  - id: led
+    name: "Display LED"
+    platform: rgb
+    red: output_red
+    green: output_green
+    blue: output_blue
+    restore_mode: ALWAYS_OFF
+
+# WICHTIG: Auf manchen 3.5"-CYDs sitzt statt eines ILI9341-kompatiblen
+# Controllers ein ST7796. Wenn das Bild nach dem Flashen verzerrt/falsch
+# eingefärbt ist, "model: ILI9341" unten durch "model: ST7796" ersetzen.
+display:
+  - id: main_display
+    platform: ili9xxx
+    model: ST7796
+    dimensions:
+      height: 320
+      width: 480
+    spi_id: tft
+    cs_pin:
+      number: GPIO15
+      ignore_strapping_warning: true
+    dc_pin:
+      number: GPIO2
+      ignore_strapping_warning: true
+    reset_pin: GPIO3
+    invert_colors: false
+    update_interval: never
+    auto_clear_enabled: false
+    transform:
+      mirror_x: true
+      swap_xy: true
+      mirror_y: true
+
+touchscreen:
+  - id: main_touchscreen
+    platform: xpt2046
+    spi_id: tft
+    cs_pin: 33
+    interrupt_pin: 36
+    threshold: 400
+    calibration:
+      x_min: 274
+      x_max: 3789
+      y_min: 343
+      y_max: 3880
+    transform:
+      mirror_x: false
+      swap_xy: true
+      mirror_y: true
+
+# Eigene Schriftart mit deutschen Sonderzeichen. Die eingebauten
+# LVGL-Fonts (montserrat_XX) enthalten nur ASCII + Gradzeichen,
+# daher fehlt dort ä/ö/ü/ß.
+font:
+  - file: "gfonts://Montserrat"
+    id: font_28
+    size: 28
+    glyphs: "!\"%()+=,-.:°ÄÖÜäöüß0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz "
+  - file: "gfonts://Montserrat"
+    id: font_48
+    size: 48
+    glyphs: "°0123456789,.- C"
+
+# Holt den Wert des bestehenden Home-Assistant-Sensors auf das Board.
+# Sobald Home Assistant einen neuen Wert meldet, wird das LVGL-Label
+# unten automatisch aktualisiert.
+sensor:
+  - platform: homeassistant
+    id: temp_aussen_nord
+    entity_id: sensor.tempaussennord_temperature
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_temp_value
+            text: !lambda 'return str_sprintf("%.1f °C", x);'
+
+lvgl:
+  displays:
+    - main_display
+  touchscreens:
+    - main_touchscreen
+  pages:
+    - id: home_page
+      bg_color: 0x000000
+      widgets:
+        - label:
+            text: "Außen Nord"
+            align: TOP_MID
+            y: 40
+            text_font: font_28
+            text_color: 0xAAAAAA
+        - label:
+            id: lbl_temp_value
+            text: "--.- °C"
+            align: CENTER
+            text_font: font_48
+            text_color: 0xFFFFFF
