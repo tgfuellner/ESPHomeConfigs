@@ -133,6 +133,29 @@ font:
 # Sobald Home Assistant einen neuen Wert meldet, wird das LVGL-Label
 # unten automatisch aktualisiert.
 sensor:
+  # Liest die Akku-Spannung über einen Spannungsteiler am ADC-Pin.
+  # WICHTIG: pin und multiply-Faktor an deine tatsächliche Verschaltung
+  # anpassen! multiply = (R1+R2)/R2 deines Spannungsteilers.
+  # Da "name:" gesetzt ist, taucht dieser Sensor automatisch als Entität
+  # in Home Assistant auf (über die bestehende api:-Verbindung) -
+  # dafür ist kein zusätzlicher Code nötig.
+  - platform: adc
+    pin: GPIO35
+    name: "Akku Spannung"
+    id: akku_spannung
+    update_interval: 10s
+    attenuation: 12db
+    filters:
+      - multiply: 2.0
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 5
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: [lbl_akku_spannung, lbl_akku_spannung2]
+            text: !lambda 'return str_sprintf("%.2f V", x);'
+
   - platform: homeassistant
     id: temp_aussen_nord
     entity_id: sensor.tempaussennord_temperature
@@ -240,6 +263,14 @@ lvgl:
             align: CENTER
             text_font: font_48
             text_color: 0xFFFFFF
+        - label:
+            id: lbl_akku_spannung
+            text: "-- V"
+            align: BOTTOM_LEFT
+            x: 5
+            y: -5
+            text_font: font_18
+            text_color: 0x81CC66
         # Unsichtbare Tipp-Fläche über die rechte Bildschirmhälfte,
         # wechselt zur Energie-Seite.
         - obj:
@@ -350,6 +381,12 @@ lvgl:
                   text: "--"
                   text_color: 0xFFFFFF
                   text_font: font_38
+              - label:
+                  id: lbl_akku_spannung2
+                  text: "-- V"
+                  align: BOTTOM_LEFT
+                  text_font: font_18
+                  text_color: 0x81CC66
 
         - obj:
             id: lv_obj_8
