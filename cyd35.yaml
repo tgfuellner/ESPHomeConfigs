@@ -216,6 +216,15 @@ sensor:
                   text_color: 0xFFFFFF
 
   - platform: homeassistant
+    id: sn_akku_soc
+    entity_id: sensor.sonnenbatterie_99688_state_battery_percentage_user
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_akku_soc
+            text: !lambda 'return str_sprintf("%.0f%%", x);'
+
+  - platform: homeassistant
     id: sn_ladew_akku
     entity_id: sensor.ladewagenbatterypower
     on_value:
@@ -223,6 +232,26 @@ sensor:
         - lvgl.label.update:
             id: lbl_ladew_akku
             text: !lambda 'return str_sprintf("%.0f", x);'
+        - if:
+            condition:
+              lambda: 'return x >= 0;'
+            then:
+              - lvgl.label.update:
+                  id: lbl_ladew_akku
+                  text_color: 0x00E000
+            else:
+              - lvgl.label.update:
+                  id: lbl_ladew_akku
+                  text_color: 0xFF3333
+
+  - platform: homeassistant
+    id: sn_ladew_akku_soc
+    entity_id: sensor.ladewagensoc
+    on_value:
+      then:
+        - lvgl.label.update:
+            id: lbl_ladew_akku_soc
+            text: !lambda 'return str_sprintf("%.0f%%", x);'
 
   - platform: homeassistant
     id: sn_haus
@@ -350,6 +379,13 @@ lvgl:
                   align: TOP_MID
                   text_color: 0xFFFFFF
               - label:
+                  id: lbl_ladew_akku_soc
+                  text: "--%"
+                  text_font: font_18
+                  align: TOP_MID
+                  y: 20
+                  text_color: 0xFFFFFF
+              - label:
                   id: lbl_ladew_akku
                   align: CENTER
                   text: "--"
@@ -401,6 +437,13 @@ lvgl:
                   text: "Akku raus"
                   text_font: font_18
                   align: TOP_MID
+                  text_color: 0xFFFFFF
+              - label:
+                  id: lbl_akku_soc
+                  text: "--%"
+                  text_font: font_18
+                  align: TOP_MID
+                  y: 20
                   text_color: 0xFFFFFF
               - label:
                   id: lbl_akku
