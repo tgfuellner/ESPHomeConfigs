@@ -65,6 +65,30 @@ light:
     blue: output_blue
     restore_mode: ALWAYS_OFF
 
+switch:
+  - platform: template
+    name: Antiburn
+    id: switch_antiburn
+    icon: mdi:television-shimmer
+    optimistic: true
+    entity_category: "config"
+    turn_on_action:
+      - logger.log: "Starting Antiburn"
+      - if:
+          condition: lvgl.is_paused
+          then:
+            - lvgl.resume:
+            - lvgl.widget.redraw:
+      - lvgl.pause:
+          show_snow: true
+    turn_off_action:
+      - logger.log: "Stopping Antiburn"
+      - if:
+          condition: lvgl.is_paused
+          then:
+            - lvgl.resume:
+            - lvgl.widget.redraw:
+
 # WICHTIG: Auf manchen 3.5"-CYDs sitzt statt eines ILI9341-kompatiblen
 # Controllers ein ST7796. Wenn das Bild nach dem Flashen verzerrt/falsch
 # eingefärbt ist, "model: ILI9341" unten durch "model: ST7796" ersetzen.
@@ -107,6 +131,14 @@ touchscreen:
       mirror_x: false
       swap_xy: true
       mirror_y: true
+    on_release:
+      then:
+        - if:
+            condition: lvgl.is_paused
+            then:
+              - lvgl.resume:
+              - lvgl.widget.redraw:
+              - switch.turn_off: switch_antiburn
 
 # Eigene Schriftart mit deutschen Sonderzeichen. Die eingebauten
 # LVGL-Fonts (montserrat_XX) enthalten nur ASCII + Gradzeichen,
@@ -303,9 +335,9 @@ lvgl:
         # Unsichtbare Tipp-Fläche über die rechte Bildschirmhälfte,
         # wechselt zur Energie-Seite.
         - obj:
-            x: 240
+            x: 320
             y: 0
-            width: 240
+            width: 160
             height: 320
             bg_opa: TRANSP
             border_width: 0
@@ -482,13 +514,24 @@ lvgl:
         # Unsichtbare Tipp-Fläche über die linke Bildschirmhälfte,
         # wechselt zurück zur Temperatur-Seite.
         - obj:
-            width: 240
+            width: 160
             height: 320
             bg_opa: TRANSP
             border_width: 0
             clickable: true
             on_click:
               - lvgl.page.show: home_page
+
+        - obj:
+            x: 160
+            y: 0
+            width: 160
+            height: 320
+            bg_opa: TRANSP
+            border_width: 0
+            clickable: true
+            on_click:
+              - switch.turn_on: switch_antiburn
 
         # Blaues Haus
         - label:
